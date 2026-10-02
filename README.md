@@ -1,6 +1,6 @@
-# kristoprifti.github.io
+# notechdebt.dev
 
-Personal site of Kristo Prifti, software architect.
+Ship fast. Owe nothing. Personal site of Kristo Prifti, software architect. Served by GitHub Pages from the repo kristoprifti.github.io.
 
 ## Deploy
 
@@ -14,3 +14,4 @@ Needs the GitHub CLI (`brew install gh`) and `gh auth login` once.
 - `index.html`  the whole site (photo and screenshots are embedded)
 - `.nojekyll`   tells GitHub Pages to serve the files as they are
 - `deploy.sh`   one-command publish
+- `CNAME`       tells GitHub Pages to serve the site on notechdebt.dev

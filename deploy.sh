@@ -49,4 +49,5 @@ git push -u origin main
 gh api -X POST "repos/$LOGIN/$REPO/pages" -f "source[branch]=main" -f "source[path]=/" >/dev/null 2>&1 || true
 
 echo ""
-echo "Done. Your site will be live in 1 to 2 minutes at: https://$REPO"
+echo "Done. Live in 1 to 2 minutes at: https://$REPO"
+if [ -f CNAME ]; then echo "Custom domain (once DNS is set up): https://$(cat CNAME)"; fi

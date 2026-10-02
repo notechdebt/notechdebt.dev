@@ -3,8 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kristo Prifti | Software Architect</title>
-<meta name="description" content="Kristo Prifti, software architect in Sweden. I build products for my own startups and for companies that need to ship.">
+<title>notechdebt.dev | Kristo Prifti, Software Architect</title>
+<meta name="description" content="Ship fast. Owe nothing. Kristo Prifti designs and builds AI, full-stack and custom software that is still clean a year from now.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2040%2040%27%3E%3Crect%20width%3D%2740%27%20height%3D%2740%27%20fill%3D%27%230B2342%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%2720%27%20r%3D%2710%27%20fill%3D%27none%27%20stroke%3D%27%23FFB84D%27%20stroke-width%3D%273.5%27/%3E%3Cpath%20d%3D%27M29%2011%2011%2029%27%20stroke%3D%27%23FFB84D%27%20stroke-width%3D%273.5%27/%3E%3C/svg%3E">
+<link rel="canonical" href="https://notechdebt.dev/">
+<meta name="theme-color" content="#0B2342">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://notechdebt.dev/">
+<meta property="og:site_name" content="notechdebt.dev">
+<meta property="og:title" content="notechdebt.dev | Ship fast. Owe nothing.">
+<meta property="og:description" content="Kristo Prifti, software architect. AI, full-stack and custom software that's still clean a year from now.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@notechdebt">
+<meta name="twitter:title" content="notechdebt.dev | Ship fast. Owe nothing.">
+<meta name="twitter:description" content="Kristo Prifti, software architect. AI, full-stack and custom software that's still clean a year from now.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -46,8 +58,23 @@ img{max-width:100%}
 .top{position:sticky;top:0;z-index:40;background:rgba(11,35,66,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--soft);padding-top:env(safe-area-inset-top,0px)}
 .top .wrap{padding:12px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px}
 .brand{display:flex;align-items:center;gap:12px;padding:4px 0}
-.brand img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid var(--acc)}
-.brand span{font-weight:800;font-size:20px;letter-spacing:-.02em}
+.logo{color:var(--acc);flex:0 0 auto;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.brand:hover .logo{transform:rotate(90deg)}
+.wm{font-family:var(--mono);font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.wm b{font-weight:500;color:var(--acc)}
+.wm i{font-style:normal;color:var(--muted)}
+.brand .wm{font-size:18px;line-height:1.1}
+.brand small{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.14em;color:var(--muted);margin-top:3px}
+.byline{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)}
+.byline img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--acc)}
+.byline b{display:block;color:var(--ink);font-weight:700;font-size:16px}
+.social{display:flex;flex-wrap:wrap;gap:10px}
+.social a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--soft);font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted);transition:border-color .2s,color .2s}
+.social a:hover{border-color:var(--acc);color:var(--acc)}
+.footbrand{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;padding-bottom:28px}
+.footbrand .wm{font-size:22px}
+@media (max-width:640px){.top .wrap{flex-wrap:nowrap}.nav a:not(.btn){display:none}.nav .btn{min-height:40px;padding:0 12px;font-size:12px;white-space:nowrap}.brand small{display:none}.brand .wm{font-size:16px}}
+.joke{margin:22px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);text-align:center}
 .nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;font-family:var(--mono);font-size:13px;letter-spacing:.04em}
 .nav a{padding:12px 0}.nav a:hover{color:var(--acc)}
 .nav .btn{padding:0 16px;min-height:42px;font-family:var(--mono);font-weight:500;font-size:13px}
@@ -182,7 +209,7 @@ img{max-width:100%}
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top"><img src="data:image/jpeg;base64,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" alt="Kristo Prifti"><span>Kristo Prifti</span></a>
+    <a class="brand" href="#top" aria-label="notechdebt.dev home"><svg class="logo" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="none" stroke="rgba(234,242,255,.45)" stroke-width="1.5"/><path d="M1 9V1h8M39 31v8h-8" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="9.5" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M28.5 11.5 11.5 28.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg><span><span class="wm"><b>no</b>techdebt<i>.dev</i></span><small>BY KRISTO PRIFTI</small></span></a>
     <nav class="nav">
       <a href="#products">Products</a>
       <a href="#clients">Client work</a>
@@ -199,8 +226,9 @@ img{max-width:100%}
       <div class="sheet-inner" data-sr="exit">
         <div style="display:flex;flex-direction:column;gap:26px">
           <span class="pill"><span class="dot"></span>AVAILABLE FOR NEW PROJECTS</span>
-          <h1 class="h1">I draw the system. <span style="color:var(--acc)">Then I build it.</span></h1>
-          <p class="lede">Software architect in Sweden. I build products for my own startups and for companies that need to ship.</p>
+          <h1 class="h1">Ship fast. <span style="color:var(--acc)">Owe nothing.</span></h1>
+          <div class="byline"><img src="data:image/jpeg;base64,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" alt="Kristo Prifti"><span><b>Kristo Prifti</b>Software architect behind notechdebt</span></div>
+          <p class="lede">I draw the system, then I build it: AI, full-stack and custom software that's still clean a year from now.</p>
           <div style="display:flex;flex-wrap:wrap;gap:14px">
             <a class="btn btn-acc" href="#contact">Work with me →</a>
             <a class="btn btn-line" href="#products">See what I've built</a>
@@ -360,17 +388,22 @@ img{max-width:100%}
       <div class="orbit"></div>
       <div style="position:relative;display:flex;flex-direction:column;gap:14px">
         <span class="label">DWG. 005 · CONTACT</span>
-        <h2 class="h2" style="font-size:clamp(36px,5vw,64px);letter-spacing:-.04em">Have a system to build? <span style="color:var(--acc)">Let's draw it.</span></h2>
+        <h2 class="h2" style="font-size:clamp(36px,5vw,64px);letter-spacing:-.04em">Got something to build? <span style="color:var(--acc)">Let's ship it, debt-free.</span></h2>
       </div>
       <div style="position:relative;display:flex;flex-wrap:wrap;gap:14px">
-        <a class="btn btn-acc cbtn" href="mailto:kristop@nsoftware.com">
+        <a class="btn btn-acc cbtn" href="mailto:hi@notechdebt.dev">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6 L12 13 L21 6"/></svg>
-          <span><span style="font-weight:800;font-size:17px">Email me</span><small>kristop@nsoftware.com</small></span>
+          <span><span style="font-weight:800;font-size:17px">Email me</span><small>hi@notechdebt.dev</small></span>
         </a>
-        <a class="btn btn-line cbtn" href="https://www.linkedin.com/in/kristoprifti93/" target="_blank" rel="noopener">
+        <a class="btn btn-line cbtn" href="https://www.linkedin.com/in/kristoprifti/" target="_blank" rel="noopener">
           <span style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:1.5px solid currentColor;font-weight:800;font-size:13px">in</span>
-          <span><span style="font-weight:800;font-size:17px">LinkedIn ↗</span><small>/in/kristoprifti93</small></span>
+          <span><span style="font-weight:800;font-size:17px">LinkedIn ↗</span><small>/in/kristoprifti</small></span>
         </a>
+        <div class="social" style="width:100%">
+          <a href="https://x.com/notechdebt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.3L5.3 21H2.2l7.2-8.3L2 3h6.4l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"/></svg>@notechdebt</a>
+          <a href="https://github.com/notechdebt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>github.com/notechdebt</a>
+          <a href="mailto:kristo@notechdebt.dev">kristo@notechdebt.dev</a>
+        </div>
       </div>
     </div>
   </section>
@@ -379,12 +412,22 @@ img{max-width:100%}
 <div id="project" class="pv" hidden></div>
 
 <footer class="foot">
+  <div class="wrap footbrand" data-sr="up">
+    <a class="brand" href="#top" style="display:flex;align-items:center;gap:14px"><svg class="logo" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" fill="none" stroke="rgba(234,242,255,.45)" stroke-width="1.5"/><path d="M1 9V1h8M39 31v8h-8" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="20" cy="20" r="9.5" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M28.5 11.5 11.5 28.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg><span><span class="wm"><b>no</b>techdebt<i>.dev</i></span><small>SHIP FAST. OWE NOTHING.</small></span></a>
+    <div class="social">
+      <a href="https://x.com/notechdebt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.3L5.3 21H2.2l7.2-8.3L2 3h6.4l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"/></svg>X</a>
+      <a href="https://github.com/notechdebt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
+      <a href="https://www.linkedin.com/in/kristoprifti/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:hi@notechdebt.dev">hi@notechdebt.dev</a>
+    </div>
+  </div>
   <div class="wrap titleblock" data-sr="up">
     <span><i>DRAWN BY</i> KRISTO PRIFTI</span>
     <span><i>ROLE</i> SOFTWARE ARCHITECT</span>
     <span><i>BASED</i> SWEDEN · REMOTE</span>
-    <span style="color:var(--acc)">© 2026 · SHEET 01 / 01</span>
+    <span style="color:var(--acc)">© 2026 · NOTECHDEBT.DEV</span>
   </div>
+  <p class="wrap joke">No tech debt was harmed in the making of this site.</p>
 </footer>
 
 <script>
@@ -522,7 +565,7 @@ img{max-width:100%}
         '<div class="layers" data-sr="up"><span style="color:var(--muted);margin-right:8px">ARCHITECTURE LAYERS</span>' + layers + '</div>' +
         '<div class="related"><div class="sec-head" data-sr="up"><div><span class="label">MORE WORK</span><h2 class="h2" style="font-size:clamp(30px,3.5vw,44px)">Related projects</h2></div><a class="crumb" href="#products">See all →</a></div><div class="rule" data-sr="line"></div><div class="grid3" style="gap:16px">' + rel + '</div></div>' +
       '</div>';
-    document.title = d.name + ' | Kristo Prifti';
+    document.title = d.name + ' | notechdebt.dev';
   }
   function route() {
     var h = location.hash || '';
@@ -535,7 +578,7 @@ img{max-width:100%}
       view.appendChild(document.getElementById('contact'));
       document.getElementById('contact').hidden = false;
     } else {
-      document.title = 'Kristo Prifti | Software Architect';
+      document.title = 'notechdebt.dev | Kristo Prifti, Software Architect';
       var c = document.getElementById('contact');
       if (c.parentNode !== home) home.appendChild(c);
       view.hidden = true; home.hidden = false; view.innerHTML = '';

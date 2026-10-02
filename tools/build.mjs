@@ -27,7 +27,16 @@ function img(slug, [w, h], alt, sizes, extra = '') {
   return `<img src="/img/${slug}-640.webp" srcset="/img/${slug}-640.webp 640w, /img/${slug}.webp 1280w" sizes="${sizes}" width="${w}" height="${h}" alt="${esc(alt)}"${extra}>`;
 }
 
-function page({ title, description, path, ogImage, ogAlt, ogType = 'website', robots = 'index, follow, max-image-preview:large', jsonld, main }) {
+// The day a page first went into git, so its publish date stays put across rebuilds; today for a new page.
+function published(rel) {
+  try {
+    const first = execFileSync('git', ['log', '--diff-filter=A', '--format=%cs', '--', rel], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop();
+    if (first) return first;
+  } catch {}
+  return new Date().toLocaleDateString('en-CA');
+}
+
+function page({ title, description, path, ogImage, ogAlt, ogType = 'website', robots = 'index, follow, max-image-preview:large', date, jsonld, main }) {
   const url = SITE + path;
   return `<!doctype html>
 <html lang="en">
@@ -48,7 +57,7 @@ ${robots.startsWith('noindex') ? '' : `<link rel="canonical" href="${url}">\n`}$
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${esc(ogAlt)}">
-<meta name="twitter:card" content="summary_large_image">
+${date ? `<meta property="article:published_time" content="${date}">\n<meta name="publish_date" property="og:publish_date" content="${date}">\n` : ''}<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@notechdebt">
 <meta name="twitter:creator" content="@notechdebt">
 ${jsonld ? ld(jsonld) + '\n' : ''}</head>
@@ -111,14 +120,15 @@ function projectPage(p, i) {
   </div>
 `;
   const url = SITE + path;
+  const date = published(`work/${p.slug}/index.html`);
   return page({
-    title: p.title, description: p.description, path, ogType: 'article',
+    title: p.title, description: p.description, path, ogType: 'article', date,
     ogImage: `/img/og/${p.slug}.png`, ogAlt: `${p.name} case study by notechdebt`,
     jsonld: {
       '@context': 'https://schema.org',
       '@graph': [
         {
-          '@type': 'WebPage', '@id': url + '#webpage', url, name: p.title, description: p.description, inLanguage: 'en',
+          '@type': 'WebPage', '@id': url + '#webpage', url, name: p.title, description: p.description, inLanguage: 'en', datePublished: date,
           isPartOf: { '@id': SITE + '/#website' }, about: { '@id': url + '#work' }, breadcrumb: { '@id': url + '#breadcrumb' },
           author: { '@id': SITE + '/#kristo' },
           primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${p.slug}.webp`, width: p.shot[0], height: p.shot[1] }
@@ -151,15 +161,16 @@ function workIndex() {
   </div>
 `;
   const url = SITE + WORK.path;
+  const date = published('work/index.html');
   return page({
-    title: WORK.title, path: WORK.path,
+    title: WORK.title, path: WORK.path, date,
     description: 'Seven case studies by software architect Kristo Prifti: AI valuations, a booking SaaS, a three.js configurator, a custom ERP, e-commerce and law firm SEO.',
     ogImage: '/img/og/home.png', ogAlt: 'notechdebt case studies',
     jsonld: {
       '@context': 'https://schema.org',
       '@graph': [
         {
-          '@type': 'CollectionPage', '@id': url + '#webpage', url, name: WORK.title, inLanguage: 'en',
+          '@type': 'CollectionPage', '@id': url + '#webpage', url, name: WORK.title, inLanguage: 'en', datePublished: date,
           isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' },
           mainEntity: { '@type': 'ItemList', itemListElement: projects.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/work/${p.slug}/`, name: p.name })) }
         },

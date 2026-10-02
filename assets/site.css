@@ -56,7 +56,7 @@ img{max-width:100%}
 .footbrand{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;padding-bottom:28px}
 .footbrand .wm{font-size:22px}
 @media (max-width:640px){.top .wrap{flex-wrap:nowrap}.nav a:not(.btn){display:none}.nav .btn{min-height:40px;padding:0 12px;font-size:12px;white-space:nowrap}.brand small{display:none}.brand .wm{font-size:16px}}
-.joke{margin:22px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);text-align:center}
+.joke{margin:22px auto 0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);text-align:center}
 .nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;font-family:var(--mono);font-size:13px;letter-spacing:.04em}
 .nav a{padding:12px 0}.nav a:hover{color:var(--acc)}
 .nav .btn{padding:0 16px;min-height:42px;font-family:var(--mono);font-weight:500;font-size:13px}

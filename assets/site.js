@@ -80,7 +80,11 @@
     els.forEach(function (el) {
       var r = el.getBoundingClientRect();
       if (el.getAttribute('data-sr') === 'exit') {
-        el.style.setProperty('--q', clamp(-r.top / (r.height * 0.9)));
+        // On phones the hero is taller than the screen, so measuring from its top faded it while you were
+        // still reading it. There, wait until its bottom edge passes mid-screen and fade as it leaves.
+        el.style.setProperty('--q', r.height > vh
+          ? clamp((vh * 0.5 - r.bottom) / (vh * 0.5))
+          : clamp(-r.top / (r.height * 0.9)));
         return;
       }
       var d = +(el.getAttribute('data-d') || 0);

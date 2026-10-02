@@ -17,7 +17,7 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 
 LOGIN="$(gh api user -q .login)"
-REPO="${LOGIN}.github.io"
+REPO="notechdebt.dev"
 if [ "$LOGIN" != "kristoprifti" ]; then
   echo "Note: you're logged in as '$LOGIN', so the site will be https://$REPO"
 fi

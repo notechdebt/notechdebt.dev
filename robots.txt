@@ -1,0 +1,6 @@
+# notechdebt.dev: everything is public, for search engines and for AI answers.
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+
+Sitemap: https://notechdebt.dev/sitemap.xml

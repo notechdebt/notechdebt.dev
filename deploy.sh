@@ -26,6 +26,12 @@ if [ ! -d .git ]; then
   git init -q -b main
 fi
 
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js not found. Install it with:  brew install node"
+  exit 1
+fi
+node tools/build.mjs
+
 git add -A
 if ! git diff --cached --quiet; then
   git commit -q -m "${1:-Update site}"

@@ -1,0 +1,14 @@
+{
+  "name": "notechdebt by Kristo Prifti",
+  "short_name": "notechdebt",
+  "description": "AI, web and custom software that ships in weeks and stays cheap to change.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0B2342",
+  "theme_color": "#0B2342",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

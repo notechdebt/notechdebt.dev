@@ -23,7 +23,7 @@ function shoot(html, out, w, h) {
     '--allow-file-access-from-files', '--virtual-time-budget=3000', `--window-size=${w},${h}`, `--screenshot=${out}`, pathToFileURL(src).href], { stdio: 'ignore' });
 }
 
-const LOGO = `<svg width="56" height="56" viewBox="0 0 40 40"><rect x="1" y="1" width="38" height="38" fill="none" stroke="rgba(234,242,255,.45)" stroke-width="1.5"/><path d="M1 9V1h8M39 31v8h-8" fill="none" stroke="#FFB84D" stroke-width="2.5"/><circle cx="20" cy="20" r="9.5" fill="none" stroke="#FFB84D" stroke-width="2.5"/><path d="M28.5 11.5 11.5 28.5" stroke="#FFB84D" stroke-width="2.5" stroke-linecap="square"/></svg>`;
+const LOGO = `<svg width="56" height="56" viewBox="0 0 40 40"><path d="M4 4h32v9H13v23H4z" fill="#FFB84D"/><path d="M36 15v21H15v-9h12V15z" fill="#EAF2FF"/></svg>`;
 
 function card({ label, title, sub, right, size }) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>

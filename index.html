@@ -17,6 +17,8 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <script src="/assets/site.js" defer></script>
+<!-- Cloudflare Web Analytics (manual snippet; the auto-injected one fails its integrity check) -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "f79f3d2fb2b74f7a9c488ab0636f309c"}'></script>
 <!-- /shared:head -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://notechdebt.dev/">
@@ -138,8 +140,8 @@
         <div style="display:flex;flex-direction:column;gap:26px">
           <span class="pill"><span class="dot"></span>AVAILABLE FOR NEW PROJECTS</span>
           <h1 class="h1">Ship fast. <span style="color:var(--acc)">Owe nothing.</span></h1>
-          <div class="byline"><img src="/img/kristo-prifti.jpg" width="160" height="160" alt="Kristo Prifti"><span><b>Kristo Prifti</b>Software architect behind notechdebt</span></div>
-          <p class="lede">I build AI, web and custom software that ships in weeks and stays cheap to change, so you never pay for the same feature twice.</p>
+          <div class="byline"><img src="/img/kristo-prifti.jpg" width="160" height="160" alt="Kristo Prifti"><span><b>Kristo Prifti</b>Software architect. Refactoring the future, one less TODO at a time.</span></div>
+          <p class="lede">Teams building AI products and custom software usually come to me with two questions: how should we build this, and why is it taking so long. I like answering both, and I'd rather show you a working version the next morning than talk about it.</p>
           <div style="display:flex;flex-wrap:wrap;gap:14px">
             <a class="btn btn-acc" href="#services">Work with me →</a>
             <a class="btn btn-line" href="#products">See what I've built</a>
@@ -183,13 +185,13 @@
     <div class="wrap">
       <div class="sec-head" data-sr="up">
         <div><span class="label">002 · PRODUCTS</span><h2 class="h2">Products I built from zero. Running live.</h2></div>
-        <span class="sec-meta">OPEN A CARD FOR THE FULL CASE STUDY</span>
+        <a class="sec-meta crumb" href="/work/">ALL CASE STUDIES →</a>
       </div>
       <div class="rule" data-sr="line"></div>
       <div class="grid3">
         <div class="cell" data-sr="up" data-d="0">
           <a class="card" data-layers="interface api ai data" href="/work/propintel/">
-            <div class="prev shot"><img src="/img/propintel-640.webp" srcset="/img/propintel-640.webp 640w, /img/propintel.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="607" alt="PropIntel real estate valuation dashboard" loading="lazy" decoding="async"><span class="fig">FIG. 1 · LIVE SCREENSHOT</span></div>
+            <div class="prev shot"><img src="/img/propintel-640.webp" srcset="/img/propintel-640.webp 640w, /img/propintel-960.webp 960w, /img/propintel.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="607" alt="PropIntel real estate valuation dashboard" loading="lazy" decoding="async"><span class="fig">FIG. 1 · LIVE SCREENSHOT</span></div>
             <div class="body">
               <span class="row"><span class="live">LIVE SINCE 2024</span><span>CASE STUDY →</span></span>
               <h3 class="name">PropIntel</h3>
@@ -201,7 +203,7 @@
         </div>
         <div class="cell" data-sr="up" data-d="1">
           <a class="card" data-layers="interface api payments data" href="/work/freemytime/">
-            <div class="prev shot"><img src="/img/freemytime-640.webp" srcset="/img/freemytime-640.webp 640w, /img/freemytime.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="800" alt="FreeMyTime online booking app" loading="lazy" decoding="async"><span class="fig">FIG. 2 · LIVE SCREENSHOT</span></div>
+            <div class="prev shot"><img src="/img/freemytime-640.webp" srcset="/img/freemytime-640.webp 640w, /img/freemytime-960.webp 960w, /img/freemytime.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="800" alt="FreeMyTime online booking app" loading="lazy" decoding="async"><span class="fig">FIG. 2 · LIVE SCREENSHOT</span></div>
             <div class="body">
               <span class="row"><span class="live">LIVE SINCE 2024</span><span>CASE STUDY →</span></span>
               <h3 class="name">FreeMyTime</h3>
@@ -213,7 +215,7 @@
         </div>
         <div class="cell" data-sr="up" data-d="2">
           <a class="card" data-layers="interface api payments" href="/work/luminavera-3d/">
-            <div class="prev shot"><img src="/img/luminavera-3d-640.webp" srcset="/img/luminavera-3d-640.webp 640w, /img/luminavera-3d.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="800" alt="LuminaVera 3D lighting configurator built with three.js" loading="lazy" decoding="async"><span class="fig">FIG. 3 · LIVE SCREENSHOT</span></div>
+            <div class="prev shot"><img src="/img/luminavera-3d-640.webp" srcset="/img/luminavera-3d-640.webp 640w, /img/luminavera-3d-960.webp 960w, /img/luminavera-3d.webp 1280w" sizes="(max-width: 760px) calc(100vw - 32px), 420px" width="1280" height="800" alt="LuminaVera 3D lighting configurator built with three.js" loading="lazy" decoding="async"><span class="fig">FIG. 3 · LIVE SCREENSHOT</span></div>
             <div class="body">
               <span class="row"><span class="live">LIVE SINCE 2025</span><span>CASE STUDY →</span></span>
               <h3 class="name">LuminaVera 3D</h3>
@@ -237,7 +239,7 @@
       <div class="grid4">
         <div class="cell" data-sr="scale" data-d="0">
           <a class="card client" data-layers="interface api data" href="/work/studio-botema-erp/">
-            <span class="thumb"><img src="/img/studio-botema-erp-640.webp" srcset="/img/studio-botema-erp-640.webp 640w, /img/studio-botema-erp.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="607" alt="Studio Botema custom ERP dashboard" loading="lazy" decoding="async"></span>
+            <span class="thumb"><img src="/img/studio-botema-erp-640.webp" srcset="/img/studio-botema-erp-640.webp 640w, /img/studio-botema-erp-960.webp 960w, /img/studio-botema-erp.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="607" alt="Studio Botema custom ERP dashboard" loading="lazy" decoding="async"></span>
             <span class="row"><span>CUSTOM ERP</span><span class="live">SINCE 2024</span></span>
             <h3 class="name">Studio Botema ERP</h3>
             <span class="desc">One internal tool for orders, stock, projects and suppliers.</span>
@@ -246,7 +248,7 @@
         </div>
         <div class="cell" data-sr="scale" data-d="1">
           <a class="card client" data-layers="interface api payments data" href="/work/luminavera/">
-            <span class="thumb"><img src="/img/luminavera-640.webp" srcset="/img/luminavera-640.webp 640w, /img/luminavera.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="607" alt="LuminaVera lighting e-commerce store" loading="lazy" decoding="async"></span>
+            <span class="thumb"><img src="/img/luminavera-640.webp" srcset="/img/luminavera-640.webp 640w, /img/luminavera-960.webp 960w, /img/luminavera.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="607" alt="LuminaVera lighting e-commerce store" loading="lazy" decoding="async"></span>
             <span class="row"><span>E-COMMERCE</span><span class="live">SINCE 2023</span></span>
             <h3 class="name">LuminaVera</h3>
             <span class="desc">Own-brand lighting store with checkout for two markets.</span>
@@ -255,7 +257,7 @@
         </div>
         <div class="cell" data-sr="scale" data-d="2">
           <a class="card client" data-layers="interface api data" href="/work/studio-botema/">
-            <span class="thumb"><img src="/img/studio-botema-640.webp" srcset="/img/studio-botema-640.webp 640w, /img/studio-botema.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="800" alt="Studio Botema designer lighting showroom website" loading="lazy" decoding="async"></span>
+            <span class="thumb"><img src="/img/studio-botema-640.webp" srcset="/img/studio-botema-640.webp 640w, /img/studio-botema-960.webp 960w, /img/studio-botema.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="800" alt="Studio Botema designer lighting showroom website" loading="lazy" decoding="async"></span>
             <span class="row"><span>BRAND SITE</span><span class="live">SINCE 2022</span></span>
             <h3 class="name">Studio Botema</h3>
             <span class="desc">Showroom site for designer lighting and furniture, connected to the ERP.</span>
@@ -264,7 +266,7 @@
         </div>
         <div class="cell" data-sr="scale" data-d="3">
           <a class="card client" data-layers="interface api data" href="/work/advlili/">
-            <span class="thumb"><img src="/img/advlili-640.webp" srcset="/img/advlili-640.webp 640w, /img/advlili.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="800" alt="AdvLili law firm website" loading="lazy" decoding="async"></span>
+            <span class="thumb"><img src="/img/advlili-640.webp" srcset="/img/advlili-640.webp 640w, /img/advlili-960.webp 960w, /img/advlili.webp 1280w" sizes="(max-width: 600px) calc(100vw - 32px), 320px" width="1280" height="800" alt="AdvLili law firm website" loading="lazy" decoding="async"></span>
             <span class="row"><span>LAW FIRM · SEO</span><span class="live">SINCE 2022</span></span>
             <h3 class="name">AdvLili</h3>
             <span class="desc">Law firm website built around useful legal content.</span>

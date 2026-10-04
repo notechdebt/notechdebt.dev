@@ -24,7 +24,7 @@ const host = (u) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const ld = (o) => `<script type="application/ld+json">\n${JSON.stringify(o, null, 2).replace(/</g, '\\u003c')}\n</script>`;
 
 function img(slug, [w, h], alt, sizes, extra = '') {
-  return `<img src="/img/${slug}-640.webp" srcset="/img/${slug}-640.webp 640w, /img/${slug}.webp 1280w" sizes="${sizes}" width="${w}" height="${h}" alt="${esc(alt)}"${extra}>`;
+  return `<img src="/img/${slug}-640.webp" srcset="/img/${slug}-640.webp 640w, /img/${slug}-960.webp 960w, /img/${slug}.webp 1280w" sizes="${sizes}" width="${w}" height="${h}" alt="${esc(alt)}"${extra}>`;
 }
 
 // The day a page first went into git, so its publish date stays put across rebuilds; today for a new page.
@@ -225,6 +225,6 @@ ${urls.map(([u, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</las
 out.push('sitemap.xml');
 
 // ---------- checks ----------
-const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/og/${p.slug}.png`]).concat('img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));
+const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`]).concat('img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));
 console.log(`Built ${out.length} files: ${out.join(', ')}`);
 if (missing.length) console.warn(`Missing images (run node tools/images.mjs for og/*.png): ${missing.join(', ')}`);

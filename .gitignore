@@ -4,3 +4,6 @@
 /work/
 /404.html
 /sitemap.xml
+
+# Local tool state
+/.superpowers/

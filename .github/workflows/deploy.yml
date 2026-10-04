@@ -27,8 +27,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Build case studies, 404 page and sitemap
-        run: node tools/build.mjs
+      - name: Build case studies, 404 page and sitemap, stamp CSS/JS versions
+        run: node tools/build.mjs --stamp
 
       - name: Collect the files to publish
         run: |

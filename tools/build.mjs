@@ -4,6 +4,7 @@
 // <!-- shared:... --> markers), so edit them there and rerun:  node tools/build.mjs
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, LAYERS } from './projects.mjs';
@@ -216,6 +217,20 @@ ${urls.map(([u, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</las
 </urlset>
 `);
 out.push('sitemap.xml');
+
+// ---------- cache-busting (CI only): point every page at the CSS/JS by content hash, so a deploy is never
+// shown with a stale stylesheet. Run as `node tools/build.mjs --stamp`; it rewrites index.html, so not locally. ----------
+if (process.argv.includes('--stamp')) {
+  const hash = (f) => createHash('sha256').update(readFileSync(join(ROOT, f))).digest('hex').slice(0, 10);
+  const stamps = [['/assets/site.css', hash('assets/site.css')], ['/assets/site.js', hash('assets/site.js')]];
+  for (const rel of ['index.html', ...out.filter((f) => f.endsWith('.html'))]) {
+    const file = join(ROOT, rel);
+    let html = readFileSync(file, 'utf8');
+    for (const [url, h] of stamps) html = html.split(`"${url}"`).join(`"${url}?v=${h}"`);
+    writeFileSync(file, html);
+  }
+  console.log(`Stamped CSS/JS versions: ${stamps.map(([u, h]) => `${u}?v=${h}`).join(', ')}`);
+}
 
 // ---------- checks ----------
 const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`]).concat('img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));

@@ -202,7 +202,7 @@ img{max-width:100%}
 .rulecard .rsub a:hover,.about-text a:hover{color:var(--acc)}
 .about{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:start}
 .about-side{display:flex;flex-direction:column;gap:18px}
-.about-side img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border:1.5px solid var(--acc)}
+.about-side img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;border:1.5px solid var(--acc)}
 .about-spec{margin:0;border-top:1.5px solid var(--line);border-left:1.5px solid var(--line)}
 .about-spec div{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
 .about-spec dt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--muted)}

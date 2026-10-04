@@ -200,11 +200,21 @@ img{max-width:100%}
 .faq-q{margin:0;font-weight:800;font-size:clamp(20px,2vw,24px);line-height:1.2;letter-spacing:-.02em;text-wrap:balance}
 .rulecard .rsub a,.about-text a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--acc);text-underline-offset:3px}
 .rulecard .rsub a:hover,.about-text a:hover{color:var(--acc)}
-.about{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
-.about img{width:clamp(96px,14vw,160px);height:auto;aspect-ratio:1;object-fit:cover;border:1.5px solid var(--acc)}
+.about{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:start}
+.about-side{display:flex;flex-direction:column;gap:18px}
+.about-side img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border:1.5px solid var(--acc)}
+.about-spec{margin:0;border-top:1.5px solid var(--line);border-left:1.5px solid var(--line)}
+.about-spec div{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+.about-spec dt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--muted)}
+.about-spec dd{margin:0;font-weight:700;font-size:16px;line-height:1.45}
 .about-text{max-width:720px;display:flex;flex-direction:column;gap:16px}
 .about-text p{margin:0;font-size:18px;line-height:1.6;color:#C9D9EE}
-@media (max-width:560px){.about{grid-template-columns:1fr}}
+.about-h{margin:20px 0 4px;font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.14em;color:var(--acc)}
+.opinions{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:20px}
+.opinions li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:2px solid var(--acc)}
+.opinions b{font-weight:800;font-size:clamp(19px,1.8vw,22px);line-height:1.25;letter-spacing:-.02em}
+.opinions span{font-size:16px;line-height:1.55;color:var(--muted)}
+@media (max-width:760px){.about{grid-template-columns:1fr}.about-side{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:start;gap:16px}.about-side img{width:110px}}
 
 /* footer case-study links + breadcrumbs */
 .footwork{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;padding:0 0 28px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted)}

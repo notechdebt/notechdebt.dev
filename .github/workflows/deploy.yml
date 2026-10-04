@@ -1,0 +1,50 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push cancels a deploy that hasn't finished.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history: the sitemap's lastmod dates come from git log
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build case studies, 404 page and sitemap
+        run: node tools/build.mjs
+
+      - name: Collect the files to publish
+        run: |
+          mkdir _site
+          rsync -a --exclude='.*' --exclude='_site' --exclude='tools' --exclude='README.md' --exclude='deploy.sh' ./ _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,4 +1,5 @@
 // Case studies. Each one becomes /work/<slug>/ when you run `node tools/build.mjs`.
+// `published` is the day the case study first went live (YYYY-MM-DD); set it once and leave it.
 // `title` and `description` are what Google shows in results: keep titles under ~60 characters
 // and descriptions under ~155. `on` lists the architecture layers lit up on the page.
 // The screenshot lives at /img/<slug>.webp (1280 wide) plus /img/<slug>-640.webp,
@@ -6,7 +7,7 @@
 
 export const projects = [
   {
-    slug: 'propintel', name: 'PropIntel', tag: 'DATA + AI', kind: 'Product', url: 'https://propintel-c1cb9.web.app/',
+    slug: 'propintel', published: '2026-10-03', name: 'PropIntel', tag: 'DATA + AI', kind: 'Product', url: 'https://propintel-c1cb9.web.app/',
     title: 'PropIntel: AI Real Estate Valuation Platform | Case Study',
     description: 'How PropIntel was built: market data and machine learning price estimates for agencies, investors and brokers in 26 cities.',
     alt: 'PropIntel real estate valuation dashboard with market data and AI price estimates',
@@ -21,7 +22,7 @@ export const projects = [
     on: ['interface', 'api', 'ai', 'data']
   },
   {
-    slug: 'freemytime', name: 'FreeMyTime', tag: 'SAAS', kind: 'Product', url: 'https://freemytime.vercel.app/',
+    slug: 'freemytime', published: '2026-10-03', name: 'FreeMyTime', tag: 'SAAS', kind: 'Product', url: 'https://freemytime.vercel.app/',
     title: 'FreeMyTime: Free Online Booking App | Case Study',
     description: 'A self-serve booking app for service businesses, built in 2 to 3 weeks with Next.js and PostgreSQL. Share one link and clients book themselves.',
     alt: 'FreeMyTime public booking page where clients pick an appointment time',
@@ -36,7 +37,7 @@ export const projects = [
     on: ['interface', 'api', 'payments', 'data']
   },
   {
-    slug: 'luminavera-3d', name: 'LuminaVera 3D Configurator', tag: '3D / WEBGL', kind: 'Product', url: 'https://luminavera-app-production.up.railway.app/',
+    slug: 'luminavera-3d', published: '2026-10-03', name: 'LuminaVera 3D Configurator', tag: '3D / WEBGL', kind: 'Product', url: 'https://luminavera-app-production.up.railway.app/',
     title: 'LuminaVera 3D: three.js Product Configurator | Case Study',
     description: 'A real-time 3D configurator for magnetic track lighting with live pricing and compatibility checks, running at 60 fps on a mid-range phone.',
     alt: 'LuminaVera 3D configurator showing a magnetic track lighting system with a live price',
@@ -51,7 +52,7 @@ export const projects = [
     on: ['interface', 'api', 'payments']
   },
   {
-    slug: 'studio-botema-erp', name: 'Studio Botema ERP', tag: 'CUSTOM ERP', kind: 'Client work', url: 'https://frontend-brown-gamma-71.vercel.app/',
+    slug: 'studio-botema-erp', published: '2026-10-03', name: 'Studio Botema ERP', tag: 'CUSTOM ERP', kind: 'Client work', url: 'https://frontend-brown-gamma-71.vercel.app/',
     title: 'Studio Botema ERP: Custom ERP for a Design Studio | Case Study',
     description: 'A custom ERP for orders, stock, projects and suppliers that replaced spreadsheets and email threads. Live in about 6 weeks with React, Node and PostgreSQL.',
     alt: 'Studio Botema ERP dashboard with supplier orders, stock and projects',
@@ -66,7 +67,7 @@ export const projects = [
     on: ['interface', 'api', 'data']
   },
   {
-    slug: 'luminavera', name: 'LuminaVera', tag: 'E-COMMERCE', kind: 'Client work', url: 'https://luminavera.com/',
+    slug: 'luminavera', published: '2026-10-03', name: 'LuminaVera', tag: 'E-COMMERCE', kind: 'Client work', url: 'https://luminavera.com/',
     title: 'LuminaVera: Headless E-commerce for EU and UK | Case Study',
     description: 'An own-brand lighting store with multi-currency checkout, rich structured data and category SEO, built with Next.js, headless commerce and Stripe.',
     alt: 'LuminaVera online lighting store home page',
@@ -81,7 +82,7 @@ export const projects = [
     on: ['interface', 'api', 'payments', 'data']
   },
   {
-    slug: 'studio-botema', name: 'Studio Botema', tag: 'BRAND SITE', kind: 'Client work', url: 'https://www.studiobotema.com/',
+    slug: 'studio-botema', published: '2026-10-03', name: 'Studio Botema', tag: 'BRAND SITE', kind: 'Client work', url: 'https://www.studiobotema.com/',
     title: 'Studio Botema: Designer Lighting Showroom Website | Case Study',
     description: 'A typography-led brand site for a boutique studio representing Lodes, Karimoku and Alphaluce, connected to the studio\'s own ERP.',
     alt: 'Studio Botema showroom website with designer lighting and furniture',
@@ -96,7 +97,7 @@ export const projects = [
     on: ['interface', 'api', 'data']
   },
   {
-    slug: 'advlili', name: 'AdvLili', tag: 'LAW FIRM · SEO', kind: 'Client work', url: 'https://advlili.com/',
+    slug: 'advlili', published: '2026-10-03', name: 'AdvLili', tag: 'LAW FIRM · SEO', kind: 'Client work', url: 'https://advlili.com/',
     title: 'AdvLili: Law Firm SEO Website | Case Study',
     description: 'How a law firm site built on in-depth legal articles, FAQ schema and fast static pages reached #1 organic results and steady inquiries without ads.',
     alt: 'AdvLili law firm website with articles on specific legal cases',

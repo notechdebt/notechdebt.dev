@@ -27,15 +27,6 @@ function img(slug, [w, h], alt, sizes, extra = '') {
   return `<img src="/img/${slug}-640.webp" srcset="/img/${slug}-640.webp 640w, /img/${slug}-960.webp 960w, /img/${slug}.webp 1280w" sizes="${sizes}" width="${w}" height="${h}" alt="${esc(alt)}"${extra}>`;
 }
 
-// The day a page first went into git, so its publish date stays put across rebuilds; today for a new page.
-function published(rel) {
-  try {
-    const first = execFileSync('git', ['log', '--diff-filter=A', '--format=%cs', '--', rel], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop();
-    if (first) return first;
-  } catch {}
-  return new Date().toLocaleDateString('en-CA');
-}
-
 function page({ title, description, path, ogImage, ogAlt, ogType = 'website', robots = 'index, follow, max-image-preview:large', date, jsonld, main }) {
   const url = SITE + path;
   return `<!doctype html>
@@ -77,7 +68,7 @@ ${FOOTER}
 `;
 }
 
-const WORK = { title: 'Case Studies: AI, SaaS, ERP and E-commerce Builds | notechdebt', path: '/work/' };
+const WORK = { title: 'Case Studies: AI, SaaS, ERP and E-commerce Builds | notechdebt', path: '/work/', published: '2026-10-03' };
 
 function breadcrumb(path, items) {
   return {
@@ -120,7 +111,7 @@ function projectPage(p, i) {
   </div>
 `;
   const url = SITE + path;
-  const date = published(`work/${p.slug}/index.html`);
+  const date = p.published;
   return page({
     title: p.title, description: p.description, path, ogType: 'article', date,
     ogImage: `/img/og/${p.slug}.png`, ogAlt: `${p.name} case study by notechdebt`,
@@ -161,7 +152,7 @@ function workIndex() {
   </div>
 `;
   const url = SITE + WORK.path;
-  const date = published('work/index.html');
+  const date = WORK.published;
   return page({
     title: WORK.title, path: WORK.path, date,
     description: 'Seven case studies by software architect Kristo Prifti: AI valuations, a booking SaaS, a three.js configurator, a custom ERP, e-commerce and law firm SEO.',
@@ -207,16 +198,18 @@ projects.forEach((p, i) => write(`work/${p.slug}/index.html`, projectPage(p, i))
 write('work/index.html', workIndex());
 write('404.html', notFound());
 
-// ---------- sitemap: lastmod is the last commit that touched the file, or today if it has uncommitted changes ----------
+// ---------- sitemap: lastmod is the last commit that touched a page's sources, or today if they have uncommitted changes ----------
+// (the generated pages aren't committed; GitHub Actions builds them on every push, with full git history)
 const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
-function lastmod(rel) {
+function lastmod(sources) {
   try {
-    const dirty = execFileSync('git', ['status', '--porcelain', '--', rel], { cwd: ROOT, encoding: 'utf8' }).trim();
+    const dirty = execFileSync('git', ['status', '--porcelain', '--', ...sources], { cwd: ROOT, encoding: 'utf8' }).trim();
     if (dirty) return today;
-    return execFileSync('git', ['log', '-1', '--format=%cs', '--', rel], { cwd: ROOT, encoding: 'utf8' }).trim() || today;
+    return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...sources], { cwd: ROOT, encoding: 'utf8' }).trim() || today;
   } catch { return today; }
 }
-const urls = [['/', 'index.html'], [WORK.path, 'work/index.html'], ...projects.map((p) => [`/work/${p.slug}/`, `work/${p.slug}/index.html`])];
+const PAGE_SOURCES = ['tools/projects.mjs', 'tools/build.mjs'];
+const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES])];
 writeFileSync(join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(([u, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</lastmod></url>`).join('\n')}

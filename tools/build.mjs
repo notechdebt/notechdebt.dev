@@ -1,5 +1,5 @@
 // Generates the static pages that sit next to the hand-written index.html:
-//   work/index.html, work/<slug>/index.html, 404.html and sitemap.xml.
+//   work/index.html, work/<slug>/index.html, apps/<slug>/index.html, 404.html and sitemap.xml.
 // The header, contact block and footer are copied from index.html (between the
 // <!-- shared:... --> markers), so edit them there and rerun:  node tools/build.mjs
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, LAYERS } from './projects.mjs';
+import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, pages as appPages } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://notechdebt.dev';
@@ -187,6 +188,47 @@ function notFound() {
   });
 }
 
+// ---------- Atlassian Marketplace apps: vendor-wide support, privacy and security pages from tools/apps.mjs ----------
+function appBlock([kind, a, b], opts = {}) {
+  const t = (x) => ((b && b.html) || opts.html ? x : esc(x));
+  if (kind === 'p') return `<p>${t(a)}</p>`;
+  if (kind === 'ul') return `<ul class="results">${a.map((li) => `<li>${esc(li)}</li>`).join('')}</ul>`;
+  // One card per app: its name, then a labelled row for each requested key (reads well at any width).
+  if (kind === 'apps') return `<div class="app-cards">${APPS.map((app) => `<div class="app-card"><h3>${esc(app.name)}</h3><dl>${a.filter((k) => k !== 'name').map((k) => `<div><dt>${esc(APP_COLUMNS[k])}</dt><dd>${esc(app[k])}</dd></div>`).join('')}</dl></div>`).join('')}</div>`;
+  if (kind === 'table') return `<div class="legal-table"><table><thead><tr>${a.map((h) => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th scope="row">${esc(c)}</th>` : `<td>${esc(c)}</td>`)).join('')}</tr>`).join('')}</tbody></table></div>`;
+  throw new Error(`tools/apps.mjs: unknown block type ${kind}`);
+}
+
+function appPage(pg) {
+  const path = `/apps/${pg.slug}/`;
+  const others = appPages.filter((o) => o !== pg).map((o) => `<a href="/apps/${o.slug}/">${esc(o.name)}</a>`).join(' <span aria-hidden="true">·</span> ');
+  const main = `  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Apps</span><span aria-hidden="true">/</span><span aria-current="page">${esc(pg.name)}</span></nav>
+    <div class="pv-head" data-sr="up">
+      <div><span class="label">${esc(VENDOR.toUpperCase())} · ATLASSIAN MARKETPLACE APPS</span><h1>${esc(pg.name)}</h1></div>
+      <p class="pv-one">${esc(pg.one)}</p>
+    </div>
+    <div class="legal">
+${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span class="label">${esc(sec.label)}</span><h2>${esc(sec.h2)}</h2>${sec.blocks.map((b) => appBlock(b)).join('')}</section>`).join('\n')}
+      <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}. Applies to every ${esc(VENDOR)} app on the Atlassian Marketplace. Also see: ${others}.</p>
+    </div>
+  </div>
+`;
+  const url = SITE + path;
+  return page({
+    title: pg.title, description: pg.description, path,
+    ogImage: '/img/og/home.png', ogAlt: `${VENDOR} apps: ${pg.name}`,
+    jsonld: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'WebPage', '@id': url + '#webpage', url, name: pg.title, description: pg.description, inLanguage: 'en', isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' } },
+        breadcrumb(path, [['Home', '/'], ['Apps'], [pg.name]])
+      ]
+    },
+    main
+  });
+}
+
 // ---------- write pages ----------
 const out = [];
 function write(rel, html) {
@@ -197,6 +239,7 @@ function write(rel, html) {
 }
 projects.forEach((p, i) => write(`work/${p.slug}/index.html`, projectPage(p, i)));
 write('work/index.html', workIndex());
+appPages.forEach((pg) => write(`apps/${pg.slug}/index.html`, appPage(pg)));
 write('404.html', notFound());
 
 // ---------- sitemap: lastmod is the last commit that touched a page's sources, or today if they have uncommitted changes ----------
@@ -210,7 +253,7 @@ function lastmod(sources) {
   } catch { return today; }
 }
 const PAGE_SOURCES = ['tools/projects.mjs', 'tools/build.mjs'];
-const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES])];
+const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES]), ...appPages.map((pg) => [`/apps/${pg.slug}/`, ['tools/apps.mjs', 'tools/build.mjs']])];
 writeFileSync(join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(([u, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</lastmod></url>`).join('\n')}

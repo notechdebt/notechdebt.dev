@@ -2,8 +2,11 @@
 // the Marketplace partner profile and every app listing. build.mjs renders each page to /apps/<slug>/.
 // Adding an app = one entry in APPS; every page's app table picks it up. Keep the texts in step with
 // the app's Marketplace "Privacy and security" answers.
-// Block types: ['p', text] · ['ul', [items]] · ['table', [header], [[row]...]] · ['apps', column keys].
+// Block types: ['p', text] · ['ul', [items]] · ['table', [header], [[row]...]] · ['apps', column keys]
+// · ['figure', image slug, { alt, caption }].
 // `html: true` marks text that contains links (written here, never user input).
+// Page images: img/<slug>.webp (1280 wide), -960, -640 and -1840 (opened on click), all 1840x900 in proportion;
+// `hero` is shown under the page title, `og` names the social preview img/og/<og>.png (node tools/images.mjs).
 
 export const VENDOR = 'notechdebt';
 export const UPDATED = '10 November 2026';
@@ -30,6 +33,9 @@ export const APP_COLUMNS = {
   kept: 'Kept for', outside: 'Sent outside Atlassian', permissions: 'Permissions', unlicensed: 'Without an active licence',
 };
 
+// Every app screenshot is a Marketplace highlight image (1840x900), published at these sizes.
+export const SHOT = [1280, 626];
+
 const mail = (a) => `<a href="mailto:${a}">${a}</a>`;
 
 export const pages = [
@@ -40,6 +46,9 @@ export const pages = [
     description: 'How to use Pearl in Confluence Cloud: insert and edit Mermaid diagrams, zoom and full screen, PDF and Word export, licensing, data and limits.',
     one: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, zoom, full screen and blur-free exports.',
     meta: 'Documentation for Pearl on Confluence Cloud.',
+    hero: { slug: 'pearl-sharp', alt: 'An order service architecture flowchart drawn by Pearl on a Confluence page in dark mode, with a zoomed-in detail that stays sharp' },
+    og: 'pearl',
+    ogSub: 'Sharp Mermaid diagrams in Confluence Cloud, with a live editor, zoom and crisp PDF export.',
     sections: [
       { id: 'insert', label: '01 · GET STARTED', h2: 'Insert a diagram', blocks: [
         ['ul', [
@@ -51,6 +60,7 @@ export const pages = [
       ] },
       { id: 'edit', label: '02 · EDITOR', h2: 'Edit with a live preview', blocks: [
         ['p', 'The editor shows your code on one side and the diagram on the other, updating as you type. Mistakes show a readable error in place of the preview. Tab indents your code. Saving also creates the images Pearl uses for exports.'],
+        ['figure', 'pearl-editor', { alt: 'Pearl\'s editor: Mermaid code pasted from an AI chat on the left, a live preview of the sequence diagram on the right', caption: 'Paste Mermaid from any AI chat as-is; the preview updates as you type.' }],
       ] },
       { id: 'view', label: '03 · VIEWING', h2: 'Zoom, pan and full screen', blocks: [
         ['ul', [
@@ -67,9 +77,11 @@ export const pages = [
           ['Page history', 'The same image, sized to the page'],
         ]],
         ['p', 'Exports use the images made when the diagram was last saved in Pearl\'s editor. If a diagram has never been saved there, PDF draws it live and Word shows its Mermaid code; open it in the editor and save once to fix that.'],
+        ['figure', 'pearl-export', { alt: 'Two zoomed-in views of the same diagram: a blurry low-resolution image on the left, Pearl\'s sharp vector PDF export on the right', caption: 'Zoomed in: a low-resolution diagram image (left) and Pearl\'s PDF export (right).' }],
       ] },
       { id: 'types', label: '05 · DIAGRAM TYPES', h2: 'Supported diagrams', blocks: [
         ['p', 'Every Mermaid diagram type: flowchart, sequence, class, state, entity relationship, Gantt, pie, mindmap, user journey, Git graph, timeline, quadrant, XY chart, requirement, C4, Sankey, block, packet, kanban, architecture and radar.'],
+        ['figure', 'pearl-gantt', { alt: 'A Gantt chart of a launch plan drawn by Pearl, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' }],
       ] },
       { id: 'licence', label: '06 · LICENSING', h2: 'Without an active licence', blocks: [
         ['p', 'Diagrams stay visible and keep exporting, so no page ever breaks. Creating or changing diagrams needs an active Pearl subscription; editing returns as soon as it is active again.'],

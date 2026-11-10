@@ -243,6 +243,13 @@ img{max-width:100%}
 .app-card dt{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);padding-top:3px}
 .app-card dd{margin:0;font-size:16px;line-height:1.55;color:#C9D9EE}
 @media (max-width:640px){.app-card dl>div{grid-template-columns:1fr}}
+.app-hero{margin-top:48px}
+.app-shot{margin:8px 0 16px}
+.app-shot a{display:block;border:1.5px solid var(--soft);transition:border-color .2s}
+.app-shot a:hover,.app-shot a:focus-visible{border-color:var(--acc)}
+.app-hero .app-shot{margin:0}.app-hero .app-shot a{border-color:var(--line)}
+.app-shot img{display:block;width:100%;height:auto;background:#0d1a2b}
+.app-shot figcaption{margin-top:10px;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--muted)}
 .legal-meta{margin:0;padding-top:24px;border-top:1px solid var(--soft);font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--muted)}
 .notfound{display:flex;flex-direction:column;gap:22px;align-items:flex-start;padding:clamp(48px,10vw,120px) 0 0}
 .notfound p{margin:0;max-width:560px;font-size:18px;line-height:1.6;color:var(--muted)}

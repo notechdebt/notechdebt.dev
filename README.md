@@ -11,6 +11,7 @@ Push to `main`. The GitHub Actions workflow in `.github/workflows/deploy.yml` bu
 - Homepage: edit `index.html` directly.
 - Header, contact block and footer: edit them in `index.html` (between the `<!-- shared:... -->` markers). The build copies them into every other page.
 - Case studies: edit `tools/projects.mjs`.
+- Atlassian Marketplace app pages (`/apps/`): edit `tools/apps.mjs`. App screenshots are the 1840x900 Marketplace highlight images, saved as `img/<slug>.webp` (1280 wide) plus `-960`, `-640` and `-1840` (opened on click); a page's `og` preview is rendered by `node tools/images.mjs`.
 - New project: add it to `tools/projects.mjs` (with today's date as `published`), put the screenshot at `img/<slug>.webp` (1280 wide), make the smaller copies with `cwebp -q 78 -resize 640 0 img/<slug>.webp -o img/<slug>-640.webp` and the same with `960`, add its card to `index.html` and its link to the footer list, then run `node tools/images.mjs` (social preview, needs Chrome) and commit the new images.
 
 ## Preview locally

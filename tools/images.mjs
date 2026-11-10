@@ -1,6 +1,6 @@
 // Renders the social preview images (img/og/*.png, 1200x630) and the app icons
 // (favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png) with headless Chrome.
-// Run it after adding a project or changing its name/one-liner:  node tools/images.mjs
+// Run it after adding a project or app page, or changing its name/one-liner:  node tools/images.mjs
 // Needs Google Chrome; set CHROME=/path/to/chrome if it isn't in the default macOS location.
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { projects } from './projects.mjs';
+import { pages as appPages } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -70,6 +71,16 @@ for (const p of projects) {
   shoot(html, join(ROOT, `img/og/${p.slug}.png`), 1200, 630);
 }
 
+// App pages with an `og` name (tools/apps.mjs): the app name beside its hero screenshot.
+const appOg = appPages.filter((pg) => pg.og && pg.hero);
+for (const pg of appOg) {
+  const html = card({
+    size: 84, label: 'ATLASSIAN MARKETPLACE APP', title: esc(pg.name), sub: pg.ogSub,
+    right: `<div class="shot"><div class="bar"><i></i><i></i><i></i></div><img src="${asset(`img/${pg.hero.slug}.webp`)}" style="object-position:left top"></div>`
+  });
+  shoot(html, join(ROOT, `img/og/${pg.og}.png`), 1200, 630);
+}
+
 // ---------- icons ----------
 const svg = readFileSync(join(ROOT, 'favicon.svg'), 'utf8');
 const iconHtml = (s) => `<!doctype html><html><body style="margin:0;width:${s}px;height:${s}px;overflow:hidden"><img src="data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}" width="${s}" height="${s}" style="display:block"></body></html>`;
@@ -89,4 +100,4 @@ pngs.forEach(([s, buf], i) => {
 writeFileSync(join(ROOT, 'favicon.ico'), Buffer.concat([head, ...pngs.map(([, b]) => b)]));
 
 rmSync(TMP, { recursive: true, force: true });
-console.log(`Rendered img/og/home.png, ${projects.length} project previews and the icons.`);
+console.log(`Rendered img/og/home.png, ${projects.length} project previews, ${appOg.length} app previews and the icons.`);

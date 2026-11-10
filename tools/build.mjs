@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, LAYERS } from './projects.mjs';
-import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, pages as appPages } from './apps.mjs';
+import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, SHOT, pages as appPages } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://notechdebt.dev';
@@ -189,7 +189,13 @@ function notFound() {
 }
 
 // ---------- Atlassian Marketplace apps: vendor-wide support, privacy and security pages from tools/apps.mjs ----------
+// An app screenshot that opens at full size (1840 wide) on click.
+function appFigure(slug, alt, caption, sizes, extra) {
+  return `<figure class="app-shot"><a href="/img/${slug}-1840.webp" target="_blank" rel="noopener" aria-label="${esc(alt)} (opens full size)">${img(slug, SHOT, alt, sizes, extra)}</a>${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`;
+}
+
 function appBlock([kind, a, b], opts = {}) {
+  if (kind === 'figure') return appFigure(a, b.alt, b.caption, '(max-width: 852px) calc(100vw - 32px), 820px', ' loading="lazy" decoding="async"');
   const t = (x) => ((b && b.html) || opts.html ? x : esc(x));
   if (kind === 'p') return `<p>${t(a)}</p>`;
   if (kind === 'ul') return `<ul class="results">${a.map((li) => `<li>${esc(li)}</li>`).join('')}</ul>`;
@@ -208,7 +214,7 @@ function appPage(pg) {
       <div><span class="label">${esc(VENDOR.toUpperCase())} · ATLASSIAN MARKETPLACE APPS</span><h1>${esc(pg.name)}</h1></div>
       <p class="pv-one">${esc(pg.one)}</p>
     </div>
-    <div class="legal">
+${pg.hero ? `    <div class="app-hero" data-sr="scale">${appFigure(pg.hero.slug, pg.hero.alt, '', '(max-width: 1312px) calc(100vw - 32px), 1280px', ' fetchpriority="high"')}</div>\n` : ''}    <div class="legal">
 ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span class="label">${esc(sec.label)}</span><h2>${esc(sec.h2)}</h2>${sec.blocks.map((b) => appBlock(b)).join('')}</section>`).join('\n')}
       <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}. ${esc(pg.meta ?? `Applies to every ${VENDOR} app on the Atlassian Marketplace.`)} Also see: ${others}.</p>
     </div>
@@ -217,11 +223,14 @@ ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span cla
   const url = SITE + path;
   return page({
     title: pg.title, description: pg.description, path,
-    ogImage: '/img/og/home.png', ogAlt: `${VENDOR} apps: ${pg.name}`,
+    ogImage: `/img/og/${pg.og ?? 'home'}.png`, ogAlt: `${VENDOR} apps: ${pg.name}`,
     jsonld: {
       '@context': 'https://schema.org',
       '@graph': [
-        { '@type': 'WebPage', '@id': url + '#webpage', url, name: pg.title, description: pg.description, inLanguage: 'en', isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' } },
+        {
+          '@type': 'WebPage', '@id': url + '#webpage', url, name: pg.title, description: pg.description, inLanguage: 'en', isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' },
+          ...(pg.hero ? { primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${pg.hero.slug}.webp`, width: SHOT[0], height: SHOT[1] } } : {})
+        },
         breadcrumb(path, [['Home', '/'], ['Apps'], [pg.name]])
       ]
     },
@@ -276,6 +285,9 @@ if (process.argv.includes('--stamp')) {
 }
 
 // ---------- checks ----------
-const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`]).concat('img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));
+const appShots = appPages.flatMap((pg) => [pg.hero?.slug, ...pg.sections.flatMap((sec) => sec.blocks.filter((b) => b[0] === 'figure').map((b) => b[1]))]).filter(Boolean);
+const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`])
+  .concat(appShots.flatMap((s) => [`img/${s}.webp`, `img/${s}-640.webp`, `img/${s}-960.webp`, `img/${s}-1840.webp`]))
+  .concat(appPages.filter((pg) => pg.og).map((pg) => `img/og/${pg.og}.png`), 'img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));
 console.log(`Built ${out.length} files: ${out.join(', ')}`);
 if (missing.length) console.warn(`Missing images (run node tools/images.mjs for og/*.png): ${missing.join(', ')}`);

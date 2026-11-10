@@ -210,7 +210,7 @@ function appPage(pg) {
     </div>
     <div class="legal">
 ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span class="label">${esc(sec.label)}</span><h2>${esc(sec.h2)}</h2>${sec.blocks.map((b) => appBlock(b)).join('')}</section>`).join('\n')}
-      <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}. Applies to every ${esc(VENDOR)} app on the Atlassian Marketplace. Also see: ${others}.</p>
+      <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}. ${esc(pg.meta ?? `Applies to every ${VENDOR} app on the Atlassian Marketplace.`)} Also see: ${others}.</p>
     </div>
   </div>
 `;

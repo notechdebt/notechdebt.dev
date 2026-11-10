@@ -34,6 +34,60 @@ const mail = (a) => `<a href="mailto:${a}">${a}</a>`;
 
 export const pages = [
   {
+    slug: 'pearl',
+    name: 'Pearl',
+    title: 'Pearl – Mermaid Diagrams for Confluence: Documentation | notechdebt',
+    description: 'How to use Pearl in Confluence Cloud: insert and edit Mermaid diagrams, zoom and full screen, PDF and Word export, licensing, data and limits.',
+    one: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, zoom, full screen and blur-free exports.',
+    meta: 'Documentation for Pearl on Confluence Cloud.',
+    sections: [
+      { id: 'insert', label: '01 · GET STARTED', h2: 'Insert a diagram', blocks: [
+        ['ul', [
+          'In the Confluence editor, type /Mermaid or /Pearl and choose Pearl – Mermaid diagram',
+          'Write Mermaid code, or paste it from any AI chat as-is: Markdown code fences are removed for you',
+          'Select Save, or press Ctrl+Enter (Cmd+Enter on Mac); then publish the page as usual',
+        ]],
+        ['p', 'To change a diagram later, select it in the page editor and choose the pencil icon.'],
+      ] },
+      { id: 'edit', label: '02 · EDITOR', h2: 'Edit with a live preview', blocks: [
+        ['p', 'The editor shows your code on one side and the diagram on the other, updating as you type. Mistakes show a readable error in place of the preview. Tab indents your code. Saving also creates the images Pearl uses for exports.'],
+      ] },
+      { id: 'view', label: '03 · VIEWING', h2: 'Zoom, pan and full screen', blocks: [
+        ['ul', [
+          'Diagrams fill the page width and follow Confluence\'s light or dark theme',
+          'Zoom with Ctrl or Cmd + scroll, a trackpad pinch, or the toolbar that appears on hover; double-click zooms in, Shift + double-click zooms out',
+          'Drag to pan once zoomed in; the keys + and − zoom, 0 fits, and the arrow keys pan',
+          'Full screen opens the diagram over the page, where plain scrolling zooms; press Esc to close',
+        ]],
+      ] },
+      { id: 'export', label: '04 · EXPORT', h2: 'PDF, Word and page history', blocks: [
+        ['table', ['Export', 'What you get'], [
+          ['PDF', 'The diagram as vector graphics: sharp when printed or zoomed'],
+          ['Word', 'A high-resolution image of the diagram'],
+          ['Page history', 'The same image, sized to the page'],
+        ]],
+        ['p', 'Exports use the images made when the diagram was last saved in Pearl\'s editor. If a diagram has never been saved there, PDF draws it live and Word shows its Mermaid code; open it in the editor and save once to fix that.'],
+      ] },
+      { id: 'types', label: '05 · DIAGRAM TYPES', h2: 'Supported diagrams', blocks: [
+        ['p', 'Every Mermaid diagram type: flowchart, sequence, class, state, entity relationship, Gantt, pie, mindmap, user journey, Git graph, timeline, quadrant, XY chart, requirement, C4, Sankey, block, packet, kanban, architecture and radar.'],
+      ] },
+      { id: 'licence', label: '06 · LICENSING', h2: 'Without an active licence', blocks: [
+        ['p', 'Diagrams stay visible and keep exporting, so no page ever breaks. Creating or changing diagrams needs an active Pearl subscription; editing returns as soon as it is active again.'],
+      ] },
+      { id: 'data', label: '07 · DATA', h2: 'Data and privacy', blocks: [
+        ['p', 'Pearl runs on Atlassian\'s Forge platform and sends nothing outside Atlassian. Diagram code is saved by Confluence in your page. Export images of each saved diagram, with the page id and save dates, are kept in Forge storage for your site; these are the data in scope for data residency. Details: <a href="/apps/privacy/">privacy policy</a> and <a href="/apps/security/">security policy</a>.', { html: true }],
+      ] },
+      { id: 'limits', label: '08 · LIMITS', h2: 'Known limits', blocks: [
+        ['ul', [
+          'Public links to Confluence pages don\'t show diagrams: Confluence hides every app\'s macros there. Guests and anonymous visitors in public spaces do see them',
+          'Diagram code can be up to 50,000 characters',
+          'Very large diagrams are exported at a lower image resolution to stay within storage limits',
+        ]],
+        ['p', 'Questions or problems: <a href="/apps/support/">support</a>, answered 24/7.', { html: true }],
+      ] },
+    ],
+  },
+  {
     slug: 'support',
     name: 'Support',
     title: 'Support and Service Level Agreement for notechdebt Apps | notechdebt',

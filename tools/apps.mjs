@@ -7,9 +7,37 @@
 // `html: true` marks text that contains links (written here, never user input).
 // Page images: img/<slug>.webp (1280 wide), -960, -640 and -1840 (opened on click), all 1840x900 in proportion;
 // `hero` is shown under the page title, `og` names the social preview img/og/<og>.png (node tools/images.mjs).
+// Section labels are numbered automatically (end of this file): write `label: 'EDITOR'`, not '02 · EDITOR'.
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+// ---------- Pearl releases ----------
+// Pearl ships in releases: `base` (2.0.0, the first listing), `a` (styles, templates, download and copy)
+// and `b` (convert code blocks, AI, admin settings; includes everything in `a`). Add a release here with the
+// date its docs go live; the newest one listed is what the pages describe, and its date is "Last updated"
+// on every /apps/ page. Preview another release locally: PEARL_PREVIEW=base node tools/build.mjs
+export const PEARL_SHIPPED = { base: '10 November 2026', b: '14 November 2026' };
+
+const RELEASES = ['base', 'a', 'b'];
+const newest = RELEASES.filter((r) => r in PEARL_SHIPPED).at(-1);
+const RELEASE = process.env.PEARL_PREVIEW || newest;
+if (!RELEASES.includes(RELEASE)) throw new Error(`tools/apps.mjs: PEARL_PREVIEW must be one of ${RELEASES.join(', ')}`);
+const has = (r) => RELEASES.indexOf(RELEASE) >= RELEASES.indexOf(r);
+
+/** `x` from release `r` on; otherwise left out (works for sections, blocks, list items and table rows). */
+const from = (r, x) => (has(r) ? x : null);
+/** The text for the release being built: the newest of `{ base, a, b }` that applies. */
+const by = (texts) => texts[RELEASES.filter((r) => has(r) && r in texts).at(-1)];
+/** A release's screenshot `{ slug, alt, caption }`, once all four sizes are in img/; otherwise `prev` (or nothing). */
+const shot = (r, next, prev = null) =>
+  has(r) && ['', '-640', '-960', '-1840'].every((s) => existsSync(join(ROOT, 'img', `${next.slug}${s}.webp`))) ? next : prev;
+const figure = (f) => (f ? ['figure', f.slug, { alt: f.alt, caption: f.caption }] : null);
 
 export const VENDOR = 'notechdebt';
-export const UPDATED = '10 November 2026';
+export const UPDATED = by(PEARL_SHIPPED);
 export const SUPPORT_EMAIL = 'support@notechdebt.dev';
 export const SECURITY_EMAIL = 'security@notechdebt.dev';
 
@@ -18,12 +46,27 @@ export const APPS = [
     name: 'Pearl – Mermaid Diagrams for Confluence',
     product: 'Confluence Cloud',
     platform: 'Atlassian Forge, Runs on Atlassian',
-    stores: 'Export images (PNG and SVG) of saved diagrams, with the page id and the dates they were saved and last used. Diagram code is saved by Confluence in your page.',
+    stores: by({
+      base: 'Export images (PNG and SVG) of saved diagrams, with the page id and the dates they were saved and last used. Diagram code is saved by Confluence in your page.',
+      b: 'Export images (PNG and SVG) of saved diagrams, with the page id and the dates they were saved and last used; the site\'s AI on/off setting and its count of AI requests this month. Diagram code is saved by Confluence in your page. AI requests and answers are not stored.',
+    }),
     where: 'Atlassian Forge storage for your Confluence site',
-    kept: 'Replaced when a diagram is saved again; deleted after 12 months without being saved or exported',
-    outside: 'Nothing',
-    permissions: 'App storage; a read-only check of whether the current user can edit a page',
-    unlicensed: 'Read-only: diagrams keep rendering and exporting; editing returns when the licence is active',
+    kept: by({
+      base: 'Replaced when a diagram is saved again; deleted after 12 months without being saved or exported',
+      b: 'Export images are replaced when a diagram is saved again and deleted after 12 months without being saved or exported; the AI request count starts again each month',
+    }),
+    outside: by({
+      base: 'Nothing',
+      b: 'Nothing. AI features use models hosted by Atlassian (Forge LLMs)',
+    }),
+    permissions: by({
+      base: 'App storage; a read-only check of whether the current user can edit a page',
+      b: 'App storage; a read-only check of whether the current user can edit a page; reading and writing a page only when a user converts its code blocks, as that user; AI models hosted by Atlassian; an admin settings page',
+    }),
+    unlicensed: by({
+      base: 'Read-only: diagrams keep rendering and exporting; editing returns when the licence is active',
+      b: 'Read-only: diagrams keep rendering and exporting; editing, AI and converting code blocks return when the licence is active',
+    }),
   },
 ];
 
@@ -38,62 +81,150 @@ export const SHOT = [1280, 626];
 
 const mail = (a) => `<a href="mailto:${a}">${a}</a>`;
 
-export const pages = [
+// Pearl's screenshots: release A images (diagram styles) replace the 2.0.0 ones once committed in img/.
+const PEARL_SHOTS = {
+  sharp: shot('a',
+    { slug: 'pearl-a-sharp', alt: 'An order service architecture flowchart drawn by Pearl in the Bold style on a Confluence page in dark mode, with a zoomed-in detail that stays sharp' },
+    { slug: 'pearl-sharp', alt: 'An order service architecture flowchart drawn by Pearl on a Confluence page in dark mode, with a zoomed-in detail that stays sharp' }),
+  editor: shot('a',
+    { slug: 'pearl-a-editor', alt: 'Pearl\'s editor: Mermaid code pasted from an AI chat with coloured syntax on the left, a live preview in the Soft style on the right, with the style picker and the Templates menu', caption: 'Paste Mermaid from any AI chat as-is, or start from a template; the preview updates as you type.' },
+    { slug: 'pearl-editor', alt: 'Pearl\'s editor: Mermaid code pasted from an AI chat on the left, a live preview of the sequence diagram on the right', caption: 'Paste Mermaid from any AI chat as-is; the preview updates as you type.' }),
+  styles: shot('a',
+    { slug: 'pearl-a-styles', alt: 'The same flowchart in Pearl\'s five styles, Soft, Bold, Minimal, Sketch and Classic, plus Bold in dark mode', caption: 'One diagram in each style. Soft, Bold and Sketch colour nodes by what they are.' }),
+  export: shot('a',
+    { slug: 'pearl-a-export', alt: 'Two zoomed-in views of the same diagram: a blurry low-resolution image on the left, Pearl\'s sharp vector PDF export in the Soft style on the right', caption: 'Zoomed in: a low-resolution diagram image (left) and Pearl\'s PDF export (right).' },
+    { slug: 'pearl-export', alt: 'Two zoomed-in views of the same diagram: a blurry low-resolution image on the left, Pearl\'s sharp vector PDF export on the right', caption: 'Zoomed in: a low-resolution diagram image (left) and Pearl\'s PDF export (right).' }),
+  gantt: shot('a',
+    { slug: 'pearl-a-gantt', alt: 'A Gantt chart of a launch plan drawn by Pearl in the Bold style, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' },
+    { slug: 'pearl-gantt', alt: 'A Gantt chart of a launch plan drawn by Pearl, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' }),
+};
+
+const pagesSource = [
   {
     slug: 'pearl',
     name: 'Pearl',
     title: 'Pearl – Mermaid Diagrams for Confluence: Documentation | notechdebt',
-    description: 'How to use Pearl in Confluence Cloud: insert and edit Mermaid diagrams, zoom and full screen, PDF and Word export, licensing, data and limits.',
-    one: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, zoom, full screen and blur-free exports.',
+    description: by({
+      base: 'How to use Pearl in Confluence Cloud: insert and edit Mermaid diagrams, zoom and full screen, PDF and Word export, licensing, data and limits.',
+      a: 'How to use Pearl in Confluence Cloud: insert and edit Mermaid diagrams, styles, templates, zoom, downloads, PDF and Word export, licensing and data.',
+      b: 'How to use Pearl in Confluence Cloud: Mermaid diagrams with a live editor, styles, AI, converting code blocks, zoom, PDF and Word export, and data.',
+    }),
+    one: by({
+      base: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, zoom, full screen and blur-free exports.',
+      a: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, styles that colour by meaning, zoom, full screen and blur-free exports.',
+      b: 'Pearl – Mermaid Diagrams for Confluence draws Mermaid diagrams as sharp vector graphics that fill the page, with a live editor, styles that colour by meaning, AI help, one-click conversion of code blocks, zoom, full screen and blur-free exports.',
+    }),
     meta: 'Documentation for Pearl on Confluence Cloud.',
-    hero: { slug: 'pearl-sharp', alt: 'An order service architecture flowchart drawn by Pearl on a Confluence page in dark mode, with a zoomed-in detail that stays sharp' },
+    hero: PEARL_SHOTS.sharp,
     og: 'pearl',
     ogSub: 'Sharp Mermaid diagrams in Confluence Cloud, with a live editor, zoom and crisp PDF export.',
     sections: [
-      { id: 'insert', label: '01 · GET STARTED', h2: 'Insert a diagram', blocks: [
+      { id: 'insert', label: 'GET STARTED', h2: 'Insert a diagram', blocks: [
         ['ul', [
           'In the Confluence editor, type /Mermaid or /Pearl and choose Pearl – Mermaid diagram',
-          'Write Mermaid code, or paste it from any AI chat as-is: Markdown code fences are removed for you',
+          by({
+            base: 'Write Mermaid code, or paste it from any AI chat as-is: Markdown code fences are removed for you',
+            a: 'Write Mermaid code, paste it from any AI chat as-is (Markdown code fences are removed for you), or start from a template',
+            b: 'Write Mermaid code, paste it from any AI chat as-is (Markdown code fences are removed for you), start from a template, or describe the diagram and let AI draw it',
+          }),
           'Select Save, or press Ctrl+Enter (Cmd+Enter on Mac); then publish the page as usual',
         ]],
         ['p', 'To change a diagram later, select it in the page editor and choose the pencil icon.'],
       ] },
-      { id: 'edit', label: '02 · EDITOR', h2: 'Edit with a live preview', blocks: [
-        ['p', 'The editor shows your code on one side and the diagram on the other, updating as you type. Mistakes show a readable error in place of the preview. Tab indents your code. Saving also creates the images Pearl uses for exports.'],
-        ['figure', 'pearl-editor', { alt: 'Pearl\'s editor: Mermaid code pasted from an AI chat on the left, a live preview of the sequence diagram on the right', caption: 'Paste Mermaid from any AI chat as-is; the preview updates as you type.' }],
+      { id: 'edit', label: 'EDITOR', h2: 'Edit with a live preview', blocks: [
+        ['p', by({
+          base: 'The editor shows your code on one side and the diagram on the other, updating as you type. Mistakes show a readable error in place of the preview. Tab indents your code. Saving also creates the images Pearl uses for exports.',
+          a: 'The editor shows your code on one side and the diagram on the other, updating as you type. The code is coloured so keywords, labels and arrows stand out. Mistakes show a readable error in place of the preview. Tab indents your code. Saving also creates the images Pearl uses for exports.',
+        })],
+        from('a', ['p', 'Templates… above the code offers 14 starting points: system architecture, a process with decisions, an API call sequence, a class diagram, a state machine, a database (ER), a project plan (Gantt), a mind map, a timeline, a user journey, Git branching, a pie chart, a priority matrix and a kanban board. A template replaces the code; Undo, next to Cancel, brings yours back.']),
+        figure(PEARL_SHOTS.editor),
       ] },
-      { id: 'view', label: '03 · VIEWING', h2: 'Zoom, pan and full screen', blocks: [
+      from('a', { id: 'styles', label: 'STYLES', h2: 'Diagram styles', blocks: [
+        ['p', 'Choose a style above the preview. Each diagram keeps its own style, and every style has a light and a dark version that follows Confluence\'s theme. New diagrams start in Soft; diagrams made before styles existed keep the Classic look until you pick another.'],
+        ['table', ['Style', 'Looks'], [
+          ['Soft', 'Gentle colours by role'],
+          ['Bold', 'Strong colours by role'],
+          ['Minimal', 'Clean black and white'],
+          ['Sketch', 'Hand-drawn, gentle colours'],
+          ['Classic', 'Mermaid\'s standard look'],
+        ]],
+        ['p', 'Soft, Bold and Sketch colour flowchart nodes by what they are, read from the shape you draw them with:'],
+        ['table', ['Shape in the code', 'Coloured as'], [
+          ['([Label]) or ((Label))', 'People, start and end'],
+          ['[(Label)]', 'Databases and data stores'],
+          ['[[Label]]', 'Queues and subprocesses'],
+          ['{Label}', 'Decisions'],
+          ['[Label] naming an outside service (a provider, email, Slack, Stripe…)', 'External services'],
+          ['[Label]', 'Steps'],
+        ]],
+        ['p', 'Your own colours win: if the code sets its own classDef, class, style or ::: colours, or its own theme, Pearl leaves them as they are. PDF, Word and downloaded images always use the light version of the style.'],
+        figure(PEARL_SHOTS.styles),
+      ] }),
+      from('b', { id: 'ai', label: 'AI', h2: 'Create and fix diagrams with AI', blocks: [
+        ['p', 'Select AI above the code and describe what you want in plain words. Create diagram draws a new diagram from your description; Tidy up this diagram makes the current one clearer without changing what it says, and follows an extra instruction if you give one. When a diagram doesn\'t render, Fix with AI appears next to the error and repairs it with as few changes as possible.'],
+        ['ul', [
+          'Every answer is drawn in the preview before it replaces your code; Undo brings your code back, and nothing reaches the page until you select Save',
+          'Requests go to AI models hosted by Atlassian, so nothing leaves Atlassian; Pearl doesn\'t store or log your descriptions, diagrams or the answers',
+          'Each site has 100 AI requests a month, shared by everyone on it; the count starts again on the 1st',
+          'AI needs an active licence, and a Confluence admin can switch it off for the site',
+        ]],
+      ] }),
+      from('b', { id: 'convert', label: 'CONVERT', h2: 'Convert Mermaid code blocks', blocks: [
+        ['p', 'Pages that already hold Mermaid code in code blocks, for example from Atlassian\'s Mermaid diagrams viewer or pasted Markdown, become Pearl diagrams in one step. On the page, open ••• → Apps → Convert Mermaid code blocks.'],
+        ['ul', [
+          'Pearl lists the code blocks tagged as Mermaid, and untagged ones whose code is clearly Mermaid, each with a preview',
+          'Choose a style for the new diagrams and select Convert; the diagrams stay editable in Pearl\'s editor',
+          'Pearl saves the page as you, with the version note "Pearl: converted … Mermaid code blocks to diagrams"; the page history keeps the old version',
+          'You need permission to edit the page, and an active licence',
+          'Blocks inside a panel, a list or anywhere else Confluence allows no macro are flagged and left as they are',
+          'If someone changes the page while the window is open, Pearl changes nothing and asks you to try again',
+        ]],
+      ] }),
+      { id: 'view', label: 'VIEWING', h2: by({ base: 'Zoom, pan and full screen', a: 'Zoom, full screen and downloads' }), blocks: [
         ['ul', [
           'Diagrams fill the page width and follow Confluence\'s light or dark theme',
           'Zoom with Ctrl or Cmd + scroll, a trackpad pinch, or the toolbar that appears on hover; double-click zooms in, Shift + double-click zooms out',
           'Drag to pan once zoomed in; the keys + and − zoom, 0 fits, and the arrow keys pan',
           'Full screen opens the diagram over the page, where plain scrolling zooms; press Esc to close',
+          from('a', 'The toolbar\'s download button saves the diagram as a PNG or SVG file, or copies it as an image, in the light version of its style'),
         ]],
       ] },
-      { id: 'export', label: '04 · EXPORT', h2: 'PDF, Word and page history', blocks: [
+      { id: 'export', label: 'EXPORT', h2: 'PDF, Word and page history', blocks: [
         ['table', ['Export', 'What you get'], [
           ['PDF', 'The diagram as vector graphics: sharp when printed or zoomed'],
           ['Word', 'A high-resolution image of the diagram'],
           ['Page history', 'The same image, sized to the page'],
         ]],
         ['p', 'Exports use the images made when the diagram was last saved in Pearl\'s editor. If a diagram has never been saved there, PDF draws it live and Word shows its Mermaid code; open it in the editor and save once to fix that.'],
-        ['figure', 'pearl-export', { alt: 'Two zoomed-in views of the same diagram: a blurry low-resolution image on the left, Pearl\'s sharp vector PDF export on the right', caption: 'Zoomed in: a low-resolution diagram image (left) and Pearl\'s PDF export (right).' }],
+        figure(PEARL_SHOTS.export),
       ] },
-      { id: 'types', label: '05 · DIAGRAM TYPES', h2: 'Supported diagrams', blocks: [
+      { id: 'types', label: 'DIAGRAM TYPES', h2: 'Supported diagrams', blocks: [
         ['p', 'Every Mermaid diagram type: flowchart, sequence, class, state, entity relationship, Gantt, pie, mindmap, user journey, Git graph, timeline, quadrant, XY chart, requirement, C4, Sankey, block, packet, kanban, architecture and radar.'],
-        ['figure', 'pearl-gantt', { alt: 'A Gantt chart of a launch plan drawn by Pearl, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' }],
+        figure(PEARL_SHOTS.gantt),
       ] },
-      { id: 'licence', label: '06 · LICENSING', h2: 'Without an active licence', blocks: [
-        ['p', 'Diagrams stay visible and keep exporting, so no page ever breaks. Creating or changing diagrams needs an active Pearl subscription; editing returns as soon as it is active again.'],
+      { id: 'licence', label: 'LICENSING', h2: 'Without an active licence', blocks: [
+        ['p', by({
+          base: 'Diagrams stay visible and keep exporting, so no page ever breaks. Creating or changing diagrams needs an active Pearl subscription; editing returns as soon as it is active again.',
+          b: 'Diagrams stay visible and keep exporting, so no page ever breaks. Creating or changing diagrams, the AI features and converting code blocks need an active Pearl subscription; they return as soon as it is active again.',
+        })],
       ] },
-      { id: 'data', label: '07 · DATA', h2: 'Data and privacy', blocks: [
-        ['p', 'Pearl runs on Atlassian\'s Forge platform and sends nothing outside Atlassian. Diagram code is saved by Confluence in your page. Export images of each saved diagram, with the page id and save dates, are kept in Forge storage for your site; these are the data in scope for data residency. Details: <a href="/apps/privacy/">privacy policy</a> and <a href="/apps/security/">security policy</a>.', { html: true }],
+      from('b', { id: 'admins', label: 'FOR ADMINS', h2: 'Settings for Confluence admins', blocks: [
+        ['p', 'In Confluence settings, Pearl – Mermaid diagrams has one switch: allow Pearl\'s AI features on this site. It also shows how many of this month\'s 100 AI requests have been used. With AI switched off, the AI button and Fix with AI no longer appear in the editor.'],
+        ['p', 'This version of Pearl asks a site admin to approve its upgrade, because it adds two permissions: reading and writing pages, used only when someone converts code blocks and only as that person, and AI models hosted by Atlassian.'],
+      ] }),
+      { id: 'data', label: 'DATA', h2: 'Data and privacy', blocks: [
+        ['p', by({
+          base: 'Pearl runs on Atlassian\'s Forge platform and sends nothing outside Atlassian. Diagram code is saved by Confluence in your page. Export images of each saved diagram, with the page id and save dates, are kept in Forge storage for your site; these are the data in scope for data residency. Details: <a href="/apps/privacy/">privacy policy</a> and <a href="/apps/security/">security policy</a>.',
+          b: 'Pearl runs on Atlassian\'s Forge platform and sends nothing outside Atlassian. Diagram code is saved by Confluence in your page. Export images of each saved diagram, with the page id and save dates, are kept in Forge storage for your site, with the AI on/off setting and this month\'s count of AI requests; these are the data in scope for data residency. AI requests go to models hosted by Atlassian, and Pearl doesn\'t store or log what is sent or returned. Pearl writes to a page only when someone converts its code blocks, as that person. Details: <a href="/apps/privacy/">privacy policy</a> and <a href="/apps/security/">security policy</a>.',
+        }), { html: true }],
       ] },
-      { id: 'limits', label: '08 · LIMITS', h2: 'Known limits', blocks: [
+      { id: 'limits', label: 'LIMITS', h2: 'Known limits', blocks: [
         ['ul', [
           'Public links to Confluence pages don\'t show diagrams: Confluence hides every app\'s macros there. Guests and anonymous visitors in public spaces do see them',
           'Diagram code can be up to 50,000 characters',
           'Very large diagrams are exported at a lower image resolution to stay within storage limits',
+          from('b', 'AI descriptions can be up to 2,000 characters, and the AI features work on diagrams up to 20,000 characters'),
+          from('b', 'Converting code blocks works on pages; blog posts aren\'t supported yet'),
         ]],
         ['p', 'Questions or problems: <a href="/apps/support/">support</a>, answered 24/7.', { html: true }],
       ] },
@@ -106,12 +237,12 @@ export const pages = [
     description: 'How to get help with notechdebt\'s Atlassian Marketplace apps: requests accepted 24/7, first response within 4 hours for urgent issues.',
     one: 'Support for every notechdebt app on the Atlassian Marketplace. Requests are accepted 24/7, every day of the year, and answered by the architect who built the app.',
     sections: [
-      { id: 'contact', label: '01 · CONTACT', h2: 'How to reach us', blocks: [
+      { id: 'contact', label: 'CONTACT', h2: 'How to reach us', blocks: [
         ['p', `Email ${mail(SUPPORT_EMAIL)}. To get a fix fastest, include:`, { html: true }],
         ['ul', ['Which app, and a link to the page or work item where it happens', 'What you expected and what happened instead', 'Your browser, and whether it happens for other users too']],
         ['p', 'Support is in English. We never ask for your password or API tokens.'],
       ] },
-      { id: 'sla', label: '02 · SERVICE LEVEL AGREEMENT', h2: 'Response times', blocks: [
+      { id: 'sla', label: 'SERVICE LEVEL AGREEMENT', h2: 'Response times', blocks: [
         ['p', 'These times apply to every notechdebt app and run from when your request arrives, on any day including weekends and holidays.'],
         ['table', ['Priority', 'Meaning', 'First response within'], [
           ['Urgent', 'The app doesn\'t work for everyone on your site', '4 hours'],
@@ -121,7 +252,7 @@ export const pages = [
         ]],
         ['p', 'A first response confirms the problem and the next step. Our apps run on Atlassian\'s cloud, so a fix reaches every customer at once.'],
       ] },
-      { id: 'apps', label: '03 · WHAT\'S COVERED', h2: 'Apps covered', blocks: [
+      { id: 'apps', label: 'WHAT\'S COVERED', h2: 'Apps covered', blocks: [
         ['p', 'Every app below, in its current release:'],
         ['apps', ['name', 'product', 'unlicensed']],
         ['p', 'Security issues are handled under the <a href="/apps/security/">security policy</a>, not this support process.', { html: true }],
@@ -135,10 +266,10 @@ export const pages = [
     description: 'What data notechdebt\'s Atlassian Marketplace apps handle, app by app: your content stays in your Atlassian site, with no tracking and no cookies.',
     one: 'Our apps keep your content inside your Atlassian site, set no cookies and track nothing. Here is what each app handles, and the little data we receive ourselves.',
     sections: [
-      { id: 'who', label: '01 · WHO WE ARE', h2: 'Who provides the apps', blocks: [
+      { id: 'who', label: 'WHO WE ARE', h2: 'Who provides the apps', blocks: [
         ['p', `notechdebt, a company registered in Bulgaria ("we"), makes apps for the Atlassian Marketplace. This policy covers all of them. Contact: ${mail(SUPPORT_EMAIL)}.`, { html: true }],
       ] },
-      { id: 'principles', label: '02 · PRINCIPLES', h2: 'How our apps treat your data', blocks: [
+      { id: 'principles', label: 'PRINCIPLES', h2: 'How our apps treat your data', blocks: [
         ['ul', [
           'Your content stays in Atlassian\'s cloud with your site and follows your site\'s data residency settings',
           'No analytics, usage tracking or cookies, and nothing sold or shared',
@@ -146,15 +277,15 @@ export const pages = [
           'If an app ever needs to send data outside Atlassian, this page and the app\'s Marketplace listing will say so before it ships',
         ]],
       ] },
-      { id: 'apps', label: '03 · APP BY APP', h2: 'What each app stores', blocks: [
+      { id: 'apps', label: 'APP BY APP', h2: 'What each app stores', blocks: [
         ['apps', ['name', 'stores', 'where', 'kept', 'outside']],
         ['p', 'If you uninstall an app, Atlassian\'s Forge data lifecycle applies to what it stored.'],
       ] },
-      { id: 'receive', label: '04 · LICENSING AND SUPPORT', h2: 'Data we do receive', blocks: [
+      { id: 'receive', label: 'LICENSING AND SUPPORT', h2: 'Data we do receive', blocks: [
         ['p', 'As a Marketplace partner we receive licence information from Atlassian, such as your organization\'s name and the names and email addresses of its technical and billing contacts. If you contact our support, we receive what you send us, such as your name, email address and message. We use this only to manage licences and answer you, keep it for as long as needed for those purposes, and never sell it.'],
         ['p', 'Atlassian hosts its products, the Forge platform and the Marketplace; its own privacy policy covers its processing.'],
       ] },
-      { id: 'rights', label: '05 · YOUR RIGHTS', h2: 'Your rights', blocks: [
+      { id: 'rights', label: 'YOUR RIGHTS', h2: 'Your rights', blocks: [
         ['p', `Under the GDPR you can ask to access, correct or delete personal data we hold about you, or object to its use. Write to ${mail(SUPPORT_EMAIL)}. You can also complain to the Bulgarian Commission for Personal Data Protection. We will post changes to this policy here with a new date.`, { html: true }],
       ] },
     ],
@@ -166,7 +297,7 @@ export const pages = [
     description: 'How notechdebt\'s Atlassian Marketplace apps are secured: built on Atlassian Forge, least privilege, vulnerability reporting and fix times.',
     one: 'Our apps are built on Atlassian Forge and, wherever possible, run entirely on Atlassian\'s own infrastructure. Here is how they are protected, and how to report a problem.',
     sections: [
-      { id: 'design', label: '01 · DESIGN', h2: 'How our apps are built', blocks: [
+      { id: 'design', label: 'DESIGN', h2: 'How our apps are built', blocks: [
         ['ul', [
           'Built on Atlassian Forge; encryption in transit and at rest, tenant isolation and hosting security come from the platform',
           'Least privilege: each app requests only the permissions it needs, listed below',
@@ -174,13 +305,13 @@ export const pages = [
           'Actions on your content are checked against the current user\'s Confluence or Jira permissions',
         ]],
       ] },
-      { id: 'apps', label: '02 · APP BY APP', h2: 'Platform and permissions', blocks: [
+      { id: 'apps', label: 'APP BY APP', h2: 'Platform and permissions', blocks: [
         ['apps', ['name', 'platform', 'permissions', 'outside']],
       ] },
-      { id: 'development', label: '03 · DEVELOPMENT', h2: 'Secure development', blocks: [
+      { id: 'development', label: 'DEVELOPMENT', h2: 'Secure development', blocks: [
         ['p', 'Every release passes unit tests, browser tests and a dependency vulnerability check before deployment. Releases with known critical or high-severity dependency issues are not shipped. Multi-factor authentication protects the source code, Atlassian and email accounts.'],
       ] },
-      { id: 'report', label: '04 · REPORTING', h2: 'Report a vulnerability', blocks: [
+      { id: 'report', label: 'REPORTING', h2: 'Report a vulnerability', blocks: [
         ['p', `Email ${mail(SECURITY_EMAIL)} with the app and the steps to reproduce. We acknowledge reports within 2 business days, and also accept reports that reach us through Atlassian's Marketplace security process.`, { html: true }],
         ['table', ['Severity (CVSS)', 'Fixed within'], [
           ['Critical (9.0 and above)', '10 days'],
@@ -190,9 +321,21 @@ export const pages = [
         ]],
         ['p', 'Times run from when a report is confirmed.'],
       ] },
-      { id: 'incidents', label: '05 · INCIDENTS', h2: 'If something goes wrong', blocks: [
+      { id: 'incidents', label: 'INCIDENTS', h2: 'If something goes wrong', blocks: [
         ['p', 'If a security incident affects customer data, we notify Atlassian and affected customers promptly, and publish what happened and what we changed.'],
       ] },
     ],
   },
 ];
+
+// Drop what from() left out, then number each page's sections: 01 · GET STARTED, 02 · EDITOR, …
+const kept = (xs) => xs.filter((x) => x != null);
+export const pages = pagesSource.map((pg) => ({
+  ...pg,
+  sections: kept(pg.sections).map((sec, i) => ({
+    ...sec,
+    label: `${String(i + 1).padStart(2, '0')} · ${sec.label}`,
+    blocks: kept(sec.blocks).map(([kind, a, b]) =>
+      kind === 'ul' ? [kind, kept(a), b] : kind === 'table' ? [kind, a, kept(b)] : b === undefined ? [kind, a] : [kind, a, b]),
+  })),
+}));

@@ -36,8 +36,15 @@ const shot = (r, next, prev = null) =>
   has(r) && ['', '-640', '-960', '-1840'].every((s) => existsSync(join(ROOT, 'img', `${next.slug}${s}.webp`))) ? next : prev;
 const figure = (f) => (f ? ['figure', f.slug, { alt: f.alt, caption: f.caption }] : null);
 
+// ---------- Opal ----------
+// The date Opal's docs page and its cards on the support, privacy and security pages went live.
+// Set to null to leave Opal out of every /apps/ page (for example while holding the page back).
+export const OPAL_LIVE = '16 November 2026';
+
 export const VENDOR = 'notechdebt';
-export const UPDATED = by(PEARL_SHIPPED);
+// "Last updated" on every /apps/ page: the newest of Pearl's release date and Opal's.
+export const UPDATED = [by(PEARL_SHIPPED), OPAL_LIVE].filter(Boolean)
+  .sort((x, y) => Date.parse(x) - Date.parse(y)).at(-1);
 export const SUPPORT_EMAIL = 'support@notechdebt.dev';
 export const SECURITY_EMAIL = 'security@notechdebt.dev';
 
@@ -68,7 +75,18 @@ export const APPS = [
       b: 'Read-only: diagrams keep rendering and exporting; editing, AI and converting code blocks return when the licence is active',
     }),
   },
-];
+  OPAL_LIVE && {
+    name: 'Opal – Markdown for Confluence',
+    product: 'Confluence Cloud',
+    platform: 'Atlassian Forge, Runs on Atlassian',
+    stores: 'Export images (PNG and SVG) of the diagrams in saved Markdown blocks, with the page id and the dates they were saved and last used. The Markdown and its plain-text copy for search are saved by Confluence in your page; attached Markdown files stay attachments of your page.',
+    where: 'Atlassian Forge storage for your Confluence site',
+    kept: 'Replaced when a block is saved again; deleted after 12 months without being saved or exported',
+    outside: 'Nothing',
+    permissions: 'App storage; a read-only check of whether the current user can edit a page; reading Markdown files attached to the page a block is on; reading and writing a page only when a user runs one of Opal\'s page actions, as that user',
+    unlicensed: 'Read-only: blocks keep rendering and exporting, and turning them into Confluence content keeps working; editing and converting Markdown macros return when the licence is active',
+  },
+].filter(Boolean);
 
 // Column keys usable in an ['apps', [...]] block, with their headers.
 export const APP_COLUMNS = {
@@ -97,6 +115,18 @@ const PEARL_SHOTS = {
   gantt: shot('a',
     { slug: 'pearl-a-gantt', alt: 'A Gantt chart of a launch plan drawn by Pearl in the Bold style, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' },
     { slug: 'pearl-gantt', alt: 'A Gantt chart of a launch plan drawn by Pearl, with its weekly date labels evenly spaced and readable', caption: 'Gantt charts keep their date labels readable at any page width.' }),
+};
+
+// Opal's screenshots: its Marketplace highlight and extra images (opal/marketing/*-1840x900.png), each
+// shown once all four sizes are in img/ (sh tools/app-shot.sh <png> <slug>).
+const opalShot = (s) => shot('base', s);
+const OPAL_SHOTS = {
+  search: opalShot({ slug: 'opal-search', alt: 'A runbook written in Markdown and shown by Opal on a Confluence page, with a warning callout, a task list, a bash command with a Copy button and a table, beside Confluence search finding the page for the word rollback' }),
+  editor: opalShot({ slug: 'opal-editor', alt: 'Opal\'s editor: the runbook\'s Markdown with coloured syntax on the left, a live preview with a warning callout and a triage flowchart in the Soft style on the right, the diagram style buttons above it and the four starter templates', caption: 'Markdown on the left, the result on the right, updating as you type.' }),
+  lightDark: opalShot({ slug: 'opal-light-dark', alt: 'The same runbook block in Confluence\'s light theme with its flowchart in the Soft style, and in the dark theme in the Bold style with the diagram\'s zoom toolbar showing', caption: 'Blocks follow Confluence\'s light and dark themes; hover a diagram to zoom or open it full screen.' }),
+  file: opalShot({ slug: 'opal-attached-file', alt: 'Opal\'s editor with Source set to Attached file, listing README.md and CHANGELOG.md from the page, and a preview of the README with a note, a bash code block and a settings table', caption: 'Show a README attached to the page; the block follows each new version of the file.' }),
+  export: opalShot({ slug: 'opal-export', alt: 'The runbook as exported to Word and PDF, with a native warning panel, headings, a flowchart image and a table, beside the Turn Opal blocks into Confluence content window listing two blocks', caption: 'Exports keep real headings, panels, tables and diagrams; turning blocks into Confluence content takes one click.' }),
+  migration: opalShot({ slug: 'opal-migration', alt: 'The Convert Markdown macros to Opal window listing three Markdown macros on a page, beside the deploy guide after converting: the same Markdown as an Opal block with a tip callout, numbered steps and a command', caption: 'Three Markdown macros converted in one step; the Markdown stays exactly as written.' }),
 };
 
 const pagesSource = [
@@ -230,6 +260,113 @@ const pagesSource = [
       ] },
     ],
   },
+  OPAL_LIVE && {
+    slug: 'opal',
+    name: 'Opal',
+    title: 'Opal – Markdown for Confluence: Documentation | notechdebt',
+    description: 'How to use Opal in Confluence Cloud: Markdown blocks with a live editor, Mermaid diagrams, search, attached .md files, PDF and Word export, and migration.',
+    one: 'Opal – Markdown for Confluence shows Markdown in Confluence Cloud with callouts, task lists, highlighted code, maths and Mermaid diagrams. Confluence search finds the words inside, PDF and Word exports keep real headings and tables, and blocks can become native Confluence content at any time.',
+    meta: 'Documentation for Opal on Confluence Cloud.',
+    hero: OPAL_SHOTS.search,
+    og: 'opal',
+    ogSub: 'Markdown in Confluence Cloud that search can find, with Mermaid diagrams and real PDF and Word exports.',
+    sections: [
+      { id: 'insert', label: 'GET STARTED', h2: 'Insert a Markdown block', blocks: [
+        ['ul', [
+          'In the Confluence editor, type /Markdown or /Opal and choose Opal – Markdown',
+          'Write Markdown, paste it from any AI chat as-is (an answer wrapped in a ```markdown fence is unwrapped for you), start from a template, or show a .md file attached to the page',
+          'Select Save, or press Ctrl+S (Cmd+S on Mac); then publish the page as usual',
+        ]],
+        ['p', 'To change a block later, select it in the page editor and choose the pencil icon.'],
+      ] },
+      { id: 'edit', label: 'EDITOR', h2: 'Write with a live preview', blocks: [
+        ['p', 'The editor shows your Markdown on one side and the result on the other, updating as you type. Headings, lists, links and code are coloured so the structure stands out. Enter continues lists and quotes, Tab indents, and Ctrl+F (Cmd+F) searches the text. The bar at the top shows the document\'s size.'],
+        ['p', 'While a block is empty, Start from a template offers four documents to adapt: README, Runbook, Decision record and Release notes. Between them they show callouts, tables, task lists and diagrams.'],
+        figure(OPAL_SHOTS.editor),
+      ] },
+      { id: 'markdown', label: 'MARKDOWN', h2: 'What Opal shows', blocks: [
+        ['p', 'Opal reads GitHub-flavoured Markdown: headings, emphasis, lists, links, quotes, tables, task lists and strikethrough, plus:'],
+        ['table', ['You write', 'Opal shows'], [
+          ['A code fence with a language, such as ```bash', 'Highlighted code with its language and a Copy button'],
+          ['> [!NOTE], [!TIP], [!IMPORTANT], [!WARNING] or [!CAUTION]', 'Coloured callouts, as on GitHub'],
+          ['- [ ] and - [x]', 'Task lists with open and ticked boxes'],
+          ['Text[^1] and [^1]: the note', 'Footnotes, listed at the end of the block'],
+          ['$…$ and $$…$$', 'Maths, typeset with KaTeX; prices like $5 stay text'],
+          ['A code fence marked mermaid', 'A diagram (see Diagrams below)'],
+        ]],
+        ['p', 'Full web addresses and email addresses become links. To keep everything inside Atlassian, images from other websites are shown as links rather than loaded, and HTML in the Markdown is shown as text rather than run.'],
+      ] },
+      { id: 'diagrams', label: 'DIAGRAMS', h2: 'Mermaid diagrams', blocks: [
+        ['p', 'A code fence marked mermaid becomes a diagram, drawn with the same engine and styles as <a href="/apps/pearl/">Pearl</a>, our Mermaid app. Every Mermaid diagram type works.', { html: true }],
+        ['p', 'When a block has diagrams, Diagram style appears above the preview: Soft, Bold, Minimal, Sketch or Classic. The style applies to every diagram in the block and has a light and a dark version that follows Confluence\'s theme. Soft, Bold and Sketch colour flowchart nodes by what they are, read from their shape (<a href="/apps/pearl/#styles">the rules</a>), unless the code sets its own colours.', { html: true }],
+        ['p', 'On the page, hover a diagram for its toolbar: zoom out, fit, zoom in and full screen. Ctrl or Cmd + scroll and a trackpad pinch zoom too, while plain scrolling keeps scrolling the page. In full screen, scrolling zooms, dragging pans and Esc closes.'],
+        figure(OPAL_SHOTS.lightDark),
+      ] },
+      { id: 'search', label: 'SEARCH', h2: 'Found by Confluence search', blocks: [
+        ['p', 'When you save a block, Opal also saves a plain-text copy of it for Confluence\'s search index. Pages then turn up for the words inside their Markdown, including the text of diagrams, and search results show readable excerpts instead of Markdown symbols. New text is usually searchable within a minute of publishing.'],
+        ['p', 'Blocks converted from another Markdown app are searchable the same way.'],
+      ] },
+      { id: 'files', label: 'ATTACHED FILES', h2: 'Show a Markdown file attached to the page', blocks: [
+        ['p', 'Teams that keep READMEs and runbooks as files can attach them to the page and show them in a block. In the editor, choose Source → Attached file, then pick one of the page\'s Markdown files (.md, .markdown, .mdown or .mkd).'],
+        ['ul', [
+          'The page always shows the file\'s latest version: upload a new version and the block follows, without editing the page',
+          'Search and turning blocks into Confluence content use the copy saved with the block, so open the block and select Save after the file changes',
+          'PDF and Word exports read the file too; if the file can\'t be read, Opal uses the copy saved with the block',
+          'A block only reads files attached to its own page',
+        ]],
+        figure(OPAL_SHOTS.file),
+      ] },
+      { id: 'export', label: 'EXPORT', h2: 'PDF, Word and page history', blocks: [
+        ['p', 'Exports turn the Markdown into native Confluence content, so a PDF or Word file has real, selectable text rather than a picture of the page.'],
+        ['table', ['In the block', 'In PDF, Word and page history'], [
+          ['Headings, lists, links and tables', 'Native headings, lists, links and tables'],
+          ['Code', 'Code blocks, highlighted by language'],
+          ['Callouts', 'Info, success, note, warning and error panels'],
+          ['Task lists', 'Confluence task lists'],
+          ['Mermaid diagrams', 'Images: vector graphics in PDF, high resolution in Word'],
+          ['Footnotes and maths', 'Footnotes after a line at the end; maths as LaTeX code'],
+        ]],
+        ['p', 'Diagram images are made when a block is saved in Opal\'s editor. A block that has never been saved there, such as one just converted from another app, exports its diagrams as code until you open it and select Save.'],
+        figure(OPAL_SHOTS.export),
+      ] },
+      { id: 'migrate', label: 'MIGRATE', h2: 'Moving from Render Markdown', blocks: [
+        ['p', 'Render Markdown runs on Atlassian Connect, which reaches end of support on 31 January 2027. Opal converts its macros in place and keeps the Markdown exactly as written. On the page, open ••• → Apps → Convert Markdown macros to Opal.'],
+        ['ul', [
+          'Opal lists the Markdown macros it can convert, including ones inside panels, tables and layouts',
+          'Select Convert; Opal saves the page as you, with the version note "Opal: converted … Markdown macros", and the page history keeps the old version',
+          'Macros with settings Opal doesn\'t have, or without Markdown text, are listed and left as they are',
+          'You need permission to edit the page, and an active licence',
+          'If someone changes the page while the window is open, Opal changes nothing and asks you to open the action again',
+        ]],
+        figure(OPAL_SHOTS.migration),
+      ] },
+      { id: 'leave', label: 'NO LOCK-IN', h2: 'Turn blocks into Confluence content', blocks: [
+        ['p', 'You can leave Opal at any time, with or without a licence. On the page, open ••• → Apps → Turn Opal blocks into Confluence content: each block becomes the same native content its exports get.'],
+        ['ul', [
+          'Mermaid diagrams at the top level of a block stay as small Opal blocks in the same style, so they keep rendering; diagrams elsewhere become code blocks',
+          'Blocks inside tables, panels and expands are listed and left alone, because Confluence allows only certain content there',
+          'This can\'t be turned back into Markdown; the page history keeps the previous version, with the version note "Opal: turned … Opal blocks into Confluence content"',
+          'You need permission to edit the page',
+        ]],
+      ] },
+      { id: 'licence', label: 'LICENSING', h2: 'Without an active licence', blocks: [
+        ['p', 'Blocks stay visible and keep exporting, so no page ever breaks, and turning them into Confluence content always works. Creating or changing blocks and converting Markdown macros need an active Opal subscription; they return as soon as it is active again.'],
+      ] },
+      { id: 'data', label: 'DATA', h2: 'Data and privacy', blocks: [
+        ['p', 'Opal runs on Atlassian\'s Forge platform and sends nothing outside Atlassian. Your Markdown, and the plain-text copy used for search, is saved by Confluence in your page, and attached files stay attachments of your page. Export images of each saved diagram, with the page id and save dates, are kept in Forge storage for your site; these are the data in scope for data residency. Opal reads files only from the page a block is on, and writes to a page only when someone runs one of its page actions, as that person. Details: <a href="/apps/privacy/">privacy policy</a> and <a href="/apps/security/">security policy</a>.', { html: true }],
+      ] },
+      { id: 'limits', label: 'LIMITS', h2: 'Known limits', blocks: [
+        ['ul', [
+          'Public links to Confluence pages don\'t show Opal blocks: Confluence hides every app\'s macros there. Guests and anonymous visitors in public spaces do see them',
+          'The editor saves blocks of up to 500,000 characters; larger documents converted from other apps, up to 1,000,000 characters, still show and export',
+          'Confluence\'s search index takes about 250,000 characters of a block; in longer blocks Opal keeps the first 240,000 characters and each later word once, so the words are still found',
+          'Exports include images for up to 20 diagrams per block; diagrams beyond that, or in places such as tables, export as code',
+          'The page actions work on pages; blog posts aren\'t supported yet',
+        ]],
+        ['p', 'Questions or problems: <a href="/apps/support/">support</a>, answered 24/7.', { html: true }],
+      ] },
+    ],
+  },
   {
     slug: 'support',
     name: 'Support',
@@ -328,9 +465,9 @@ const pagesSource = [
   },
 ];
 
-// Drop what from() left out, then number each page's sections: 01 · GET STARTED, 02 · EDITOR, …
+// Drop what from() or OPAL_LIVE left out, then number each page's sections: 01 · GET STARTED, 02 · EDITOR, …
 const kept = (xs) => xs.filter((x) => x != null);
-export const pages = pagesSource.map((pg) => ({
+export const pages = kept(pagesSource).map((pg) => ({
   ...pg,
   sections: kept(pg.sections).map((sec, i) => ({
     ...sec,

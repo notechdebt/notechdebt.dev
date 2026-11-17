@@ -261,7 +261,8 @@ ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span cla
           ...(pg.hero ? { primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${pg.hero.slug}.webp`, width: SHOT[0], height: SHOT[1] } } : {}),
           ...(pg.video ? { video: { '@id': url + '#video' } } : {})
         },
-        breadcrumb(path, [['Home', '/'], ['Apps'], [pg.name]]),
+        // No /apps/ index page exists, so the trail skips "Apps": Google requires a URL for every crumb but the last.
+        breadcrumb(path, [['Home', '/'], [pg.name]]),
         ...(pg.video ? [videoObject(pg, url)] : [])
       ]
     },

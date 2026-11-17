@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, LAYERS } from './projects.mjs';
-import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, SHOT, MEDIA, pages as appPages } from './apps.mjs';
+import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, SHOT, MEDIA, HUB, pages as appPages } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://notechdebt.dev';
@@ -236,9 +236,9 @@ function videoObject(pg, url) {
 
 function appPage(pg) {
   const path = `/apps/${pg.slug}/`;
-  const others = appPages.filter((o) => o !== pg).map((o) => `<a href="/apps/${o.slug}/">${esc(o.name)}</a>`).join(' <span aria-hidden="true">·</span> ');
+  const others = ['<a href="/apps/">All apps</a>', ...appPages.filter((o) => o !== pg).map((o) => `<a href="/apps/${o.slug}/">${esc(o.name)}</a>`)].join(' <span aria-hidden="true">·</span> ');
   const main = `  <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Apps</span><span aria-hidden="true">/</span><span aria-current="page">${esc(pg.name)}</span></nav>
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/apps/">Apps</a><span aria-hidden="true">/</span><span aria-current="page">${esc(pg.name)}</span></nav>
     <div class="pv-head" data-sr="up">
       <div><span class="label">${esc(VENDOR.toUpperCase())} · ATLASSIAN MARKETPLACE APPS</span><h1>${esc(pg.name)}</h1></div>
       <p class="pv-one">${esc(pg.one)}</p>
@@ -261,9 +261,53 @@ ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span cla
           ...(pg.hero ? { primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${pg.hero.slug}.webp`, width: SHOT[0], height: SHOT[1] } } : {}),
           ...(pg.video ? { video: { '@id': url + '#video' } } : {})
         },
-        // No /apps/ index page exists, so the trail skips "Apps": Google requires a URL for every crumb but the last.
-        breadcrumb(path, [['Home', '/'], [pg.name]]),
+        breadcrumb(path, [['Home', '/'], ['Apps', '/apps/'], [pg.name]]),
         ...(pg.video ? [videoObject(pg, url)] : [])
+      ]
+    },
+    main
+  });
+}
+
+// ---------- /apps/: every app with a docs page (tools/apps.mjs APPS + HUB), then the vendor-wide pages ----------
+function appsHub() {
+  const path = '/apps/';
+  const url = SITE + path;
+  const apps = APPS.filter((a) => a.docs).map((a) => ({ ...a, pg: appPages.find((p) => p.slug === a.docs) })).filter((a) => a.pg);
+  const vendor = appPages.filter((p) => !APPS.some((a) => a.docs === p.slug));
+  const tiles = apps.map((a, i) => `<div class="cell" data-sr="up" data-d="${i % 3}"><a class="card rel-card app-tile" href="/apps/${a.docs}/">`
+    + (a.pg.hero ? `<span class="thumb">${img(a.pg.hero.slug, SHOT, a.pg.hero.alt, '(max-width: 760px) calc(100vw - 32px), 630px', i ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"')}</span>` : '')
+    + `<span class="row"><span>${esc(a.product.toUpperCase())}</span><span>DOCS →</span></span>`
+    + `<h2 class="name"><img class="app-logo" src="/img/${a.logo}.webp" width="44" height="44" alt="">${esc(a.name)}</h2><span class="desc">${esc(a.tagline)}</span></a>`
+    + `<p class="app-mkt">${a.marketplace ? `<a href="${esc(a.marketplace)}" target="_blank" rel="noopener">On the Atlassian Marketplace ↗</a>` : 'Atlassian Marketplace listing coming soon'}</p></div>`).join('\n      ');
+  const main = `  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Apps</span></nav>
+    <div class="pv-head" data-sr="up">
+      <div><span class="label">${esc(VENDOR.toUpperCase())} · ${apps.length} ATLASSIAN MARKETPLACE APPS</span><h1>Apps</h1></div>
+      <p class="pv-one">${esc(HUB.one)}</p>
+    </div>
+    <div class="rule" data-sr="line" style="margin-top:48px"></div>
+    <div class="grid3 app-tiles">
+      ${tiles}
+    </div>
+    <div class="legal">
+      <section id="policies" data-sr="up"><span class="label">FOR EVERY APP</span><h2>Support, privacy and security</h2><ul class="results hub-links">${vendor.map((p) => `<li><span><a href="/apps/${p.slug}/">${esc(p.name)}</a>: ${esc(p.description.replace(/ \| notechdebt$/, ''))}</span></li>`).join('')}</ul></section>
+      <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}.</p>
+    </div>
+  </div>
+`;
+  return page({
+    title: HUB.title, description: HUB.description, path,
+    ogImage: '/img/og/apps.png', ogAlt: `${VENDOR} apps for the Atlassian Marketplace`,
+    jsonld: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'CollectionPage', '@id': url + '#webpage', url, name: HUB.title, description: HUB.description, inLanguage: 'en',
+          isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' }, publisher: { '@id': SITE + '/#org' },
+          mainEntity: { '@type': 'ItemList', itemListElement: apps.map((a, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/apps/${a.docs}/`, name: a.name })) }
+        },
+        breadcrumb(path, [['Home', '/'], ['Apps']])
       ]
     },
     main
@@ -280,6 +324,7 @@ function write(rel, html) {
 }
 projects.forEach((p, i) => write(`work/${p.slug}/index.html`, projectPage(p, i)));
 write('work/index.html', workIndex());
+write('apps/index.html', appsHub());
 appPages.forEach((pg) => write(`apps/${pg.slug}/index.html`, appPage(pg)));
 appPages.filter((pg) => pg.video).forEach((pg) => write(`apps/${pg.slug}/captions.vtt`, vtt(pg.video)));
 write('404.html', notFound());
@@ -295,7 +340,7 @@ function lastmod(sources) {
   } catch { return today; }
 }
 const PAGE_SOURCES = ['tools/projects.mjs', 'tools/build.mjs'];
-const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES]), ...appPages.map((pg) => [`/apps/${pg.slug}/`, ['tools/apps.mjs', 'tools/build.mjs'], pg.video])];
+const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES]), ['/apps/', ['tools/apps.mjs', 'tools/build.mjs']], ...appPages.map((pg) => [`/apps/${pg.slug}/`, ['tools/apps.mjs', 'tools/build.mjs'], pg.video])];
 const xml = (t) => esc(t).replace(/'/g, '&apos;');
 const sitemapVideo = (v) => `<video:video><video:thumbnail_loc>${SITE}/img/${v.poster}.webp</video:thumbnail_loc><video:title>${xml(v.name)}</video:title>`
   + `<video:description>${xml(v.description)}</video:description><video:content_loc>${MEDIA}/${v.file}</video:content_loc>`
@@ -326,6 +371,7 @@ const appShots = appPages.flatMap((pg) => [pg.hero?.slug, ...pg.sections.flatMap
 const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`])
   .concat(appShots.flatMap((s) => [`img/${s}.webp`, `img/${s}-640.webp`, `img/${s}-960.webp`, `img/${s}-1840.webp`]))
   .concat(appPages.filter((pg) => pg.og).map((pg) => `img/og/${pg.og}.png`), 'img/og/home.png')
-  .concat(appPages.filter((pg) => pg.video).map((pg) => `img/${pg.video.poster}.webp`)).filter((f) => !existsSync(join(ROOT, f)));
+  .concat(appPages.filter((pg) => pg.video).map((pg) => `img/${pg.video.poster}.webp`))
+  .concat(APPS.filter((a) => a.docs).map((a) => `img/${a.logo}.webp`), 'img/og/apps.png').filter((f) => !existsSync(join(ROOT, f)));
 console.log(`Built ${out.length} files: ${out.join(', ')}`);
 if (missing.length) console.warn(`Missing images (run node tools/images.mjs for og/*.png): ${missing.join(', ')}`);

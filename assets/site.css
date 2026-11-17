@@ -250,6 +250,13 @@ img{max-width:100%}
 .app-hero .app-shot{margin:0}.app-hero .app-shot a{border-color:var(--line)}
 .app-shot img{display:block;width:100%;height:auto;background:#0d1a2b}
 .app-shot figcaption{margin-top:10px;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--muted)}
+.app-tiles{margin-top:8px}
+.app-tile .thumb{height:auto;aspect-ratio:1280/626}
+.app-tile .name{display:flex;align-items:center;gap:14px;font-size:24px;line-height:1.15}
+.app-logo{width:44px;height:44px;flex:none}
+.app-tile .desc{flex-grow:1}
+.app-mkt{margin:12px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.app-mkt a,.hub-links a{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
 .app-video{margin:0}
 .app-video video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0d1a2b;border:1.5px solid var(--line)}
 .app-video figcaption{margin-top:12px;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--muted)}

@@ -91,9 +91,14 @@ export const UPDATED = [by(PEARL_SHIPPED), OPAL_LIVE].filter(Boolean)
 export const SUPPORT_EMAIL = 'support@notechdebt.dev';
 export const SECURITY_EMAIL = 'security@notechdebt.dev';
 
+// Each app: its card on the support, privacy and security pages (the APP_COLUMNS keys), and its tile on /apps/:
+// `docs` (slug of its docs page below), `logo` (img/<logo>.webp, 192×192, from the app's marketing/ logo),
+// `tagline` (one sentence) and `marketplace` (the listing URL once Atlassian approves it; null until then).
 export const APPS = [
   {
     name: 'Pearl – Mermaid Diagrams for Confluence',
+    docs: 'pearl', logo: 'pearl-logo', marketplace: null,
+    tagline: 'Sharp, zoomable Mermaid diagrams in Confluence: paste from any AI tool, edit with a live preview, and export PDFs without blur.',
     product: 'Confluence Cloud',
     platform: 'Atlassian Forge, Runs on Atlassian',
     stores: by({
@@ -120,6 +125,8 @@ export const APPS = [
   },
   OPAL_LIVE && {
     name: 'Opal – Markdown for Confluence',
+    docs: 'opal', logo: 'opal-logo', marketplace: null,
+    tagline: 'Markdown in Confluence that search can find, with a live preview, Mermaid diagrams, real Word and PDF exports, and no lock-in.',
     product: 'Confluence Cloud',
     platform: 'Atlassian Forge, Runs on Atlassian',
     stores: 'Export images (PNG and SVG) of the diagrams in saved Markdown blocks, with the page id and the dates they were saved and last used. The Markdown and its plain-text copy for search are saved by Confluence in your page; attached Markdown files stay attachments of your page.',
@@ -130,6 +137,17 @@ export const APPS = [
     unlicensed: 'Read-only: blocks keep rendering and exporting, and turning them into Confluence content keeps working; editing and converting Markdown macros return when the licence is active',
   },
 ].filter(Boolean);
+
+// ---------- The /apps/ page (build.mjs: appsHub) ----------
+// Every app above with a `docs` page gets a tile, in this order; the support, privacy and security pages are
+// linked below them. The title names the Atlassian products the apps work with, so it grows with the list.
+const PRODUCTS = [...new Set(APPS.map((a) => a.product))];
+const andList = (xs) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
+export const HUB = {
+  title: `Atlassian Marketplace Apps for ${andList(PRODUCTS)} | notechdebt`,
+  description: `notechdebt's apps for ${andList(PRODUCTS)}, built on Atlassian Forge: ${andList(APPS.map((a) => a.name.split(' – ')[0]))}. Your content stays in your Atlassian site.`,
+  one: `Apps for ${andList(PRODUCTS)}, built on Atlassian Forge by the architect who answers your support requests. Your content stays in your Atlassian site, and one support, privacy and security policy covers every app.`,
+};
 
 // Column keys usable in an ['apps', [...]] block, with their headers.
 export const APP_COLUMNS = {

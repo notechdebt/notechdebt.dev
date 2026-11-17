@@ -1,6 +1,7 @@
 // Renders the social preview images (img/og/*.png, 1200x630) and the app icons
 // (favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png) with headless Chrome.
 // Run it after adding a project or app page, or changing its name/one-liner:  node tools/images.mjs
+// To render only some previews (and no icons), name them: node tools/images.mjs apps opal
 // Needs Google Chrome; set CHROME=/path/to/chrome if it isn't in the default macOS location.
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -8,11 +9,14 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { projects } from './projects.mjs';
-import { pages as appPages } from './apps.mjs';
+import { pages as appPages, APPS } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const TMP = mkdtempSync(join(tmpdir(), 'notechdebt-img-'));
+const ONLY = process.argv.slice(2);
+const want = (name) => !ONLY.length || ONLY.includes(name);
+let rendered = 0;
 const asset = (p) => pathToFileURL(join(ROOT, p)).href;
 const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -60,9 +64,10 @@ const home = card({
   sub: 'AI, web and custom software that ships in weeks and stays cheap to change.',
   right: `<div class="me"><img src="${asset('img/kristo-prifti.jpg')}"><span><b>Kristo Prifti</b>SOFTWARE ARCHITECT</span></div>`, size: 92
 });
-shoot(home, join(ROOT, 'img/og/home.png'), 1200, 630);
+if (want('home')) { shoot(home, join(ROOT, 'img/og/home.png'), 1200, 630); rendered++; }
 
-for (const p of projects) {
+for (const p of projects.filter((p) => want(p.slug))) {
+  rendered++;
   const size = p.name.length > 18 ? 60 : p.name.length > 12 ? 72 : 84;
   const html = card({
     size, label: `CASE STUDY · ${p.tag}`, title: esc(p.name), sub: p.one.split(/(?<=\.)\s/)[0],
@@ -72,8 +77,9 @@ for (const p of projects) {
 }
 
 // App pages with an `og` name (tools/apps.mjs): the app name beside its hero screenshot.
-const appOg = appPages.filter((pg) => pg.og && pg.hero);
+const appOg = appPages.filter((pg) => pg.og && pg.hero && want(pg.og));
 for (const pg of appOg) {
+  rendered++;
   const html = card({
     size: 84, label: 'ATLASSIAN MARKETPLACE APP', title: esc(pg.name), sub: pg.ogSub,
     right: `<div class="shot"><div class="bar"><i></i><i></i><i></i></div><img src="${asset(`img/${pg.hero.slug}.webp`)}" style="object-position:left top"></div>`
@@ -81,7 +87,25 @@ for (const pg of appOg) {
   shoot(html, join(ROOT, `img/og/${pg.og}.png`), 1200, 630);
 }
 
+// The /apps/ page: every app's logo and name.
+if (want('apps')) {
+  const apps = APPS.filter((a) => a.docs);
+  const big = apps.length <= 3;
+  const list = apps.map((a) => {
+    const [name, sub] = a.name.split(' – ');
+    return `<div style="display:flex;align-items:center;gap:${big ? 22 : 14}px"><img src="${asset(`img/${a.logo}.webp`)}" style="width:${big ? 96 : 64}px;height:${big ? 96 : 64}px"><span><b style="display:block;font-size:${big ? 38 : 28}px;font-weight:800;letter-spacing:-.02em;color:#EAF2FF">${esc(name)}</b><span style="font-size:${big ? 20 : 16}px;color:#A9C2E3">${esc(sub ?? '')}</span></span></div>`;
+  }).join('');
+  const html = card({
+    size: 92, label: 'ATLASSIAN MARKETPLACE APPS', title: 'notechdebt<br><span>apps</span>',
+    sub: 'Built on Atlassian Forge. Your content stays in your Atlassian site.',
+    right: `<div style="align-self:center;display:grid;grid-template-columns:${big ? '1fr' : '1fr 1fr'};gap:${big ? 34 : 22}px;width:${big ? 470 : 520}px">${list}</div>`
+  });
+  shoot(html, join(ROOT, 'img/og/apps.png'), 1200, 630);
+  rendered++;
+}
+
 // ---------- icons ----------
+if (!ONLY.length) {
 const svg = readFileSync(join(ROOT, 'favicon.svg'), 'utf8');
 const iconHtml = (s) => `<!doctype html><html><body style="margin:0;width:${s}px;height:${s}px;overflow:hidden"><img src="data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}" width="${s}" height="${s}" style="display:block"></body></html>`;
 for (const [name, s] of [['icon-512.png', 512], ['icon-192.png', 192], ['apple-touch-icon.png', 180]]) shoot(iconHtml(s), join(ROOT, name), s, s);
@@ -98,6 +122,7 @@ pngs.forEach(([s, buf], i) => {
   offset += buf.length;
 });
 writeFileSync(join(ROOT, 'favicon.ico'), Buffer.concat([head, ...pngs.map(([, b]) => b)]));
+}
 
 rmSync(TMP, { recursive: true, force: true });
-console.log(`Rendered img/og/home.png, ${projects.length} project previews, ${appOg.length} app previews and the icons.`);
+console.log(`Rendered ${rendered} preview image(s)${ONLY.length ? '' : ' and the icons'}.`);

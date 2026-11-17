@@ -41,6 +41,49 @@ const figure = (f) => (f ? ['figure', f.slug, { alt: f.alt, caption: f.caption }
 // Set to null to leave Opal out of every /apps/ page (for example while holding the page back).
 export const OPAL_LIVE = '16 November 2026';
 
+// ---------- Demo videos ----------
+// The MP4s live on media.notechdebt.dev (the notechdebt/media repo on GitHub Pages, its DNS record set to
+// DNS only), not on this site: Cloudflare's CDN terms don't allow serving video through it. A page's `video`
+// replaces its hero screenshot. `poster` is img/<poster>.webp (1280×720, a frame of the video). `cues` are
+// the narration ([start s, end s, text]): build.mjs writes them to /apps/<slug>/captions.vtt and shows them
+// as the page's transcript. Re-recorded a video? Re-measure the cues and change `uploaded`.
+export const MEDIA = 'https://media.notechdebt.dev';
+
+const PEARL_VIDEO = {
+  file: 'pearl-demo.mp4', poster: 'pearl-video', seconds: 55, uploaded: '2026-11-17',
+  name: 'Pearl – Mermaid Diagrams for Confluence in 55 seconds',
+  description: 'A short tour of Pearl in Confluence Cloud: paste Mermaid from an AI chat, pick a diagram style, zoom and open full screen on the page, convert existing Mermaid code blocks in one click, and fix a typo with AI.',
+  cues: [
+    [0.4, 3.1, 'Meet Pearl: Mermaid diagrams for Confluence.'],
+    [3.7, 9.2, 'Paste a diagram from any AI tool. The code fences vanish, and the preview draws live.'],
+    [12.2, 16.7, 'Pick from five styles that colour each node by its meaning, in light and dark.'],
+    [20.9, 26.2, 'On the page, diagrams stay sharp at any zoom. Open full screen to explore the detail.'],
+    [31.5, 35.7, 'Already have Mermaid code blocks? Convert them to diagrams in one click.'],
+    [42.0, 45.6, 'Made a typo? Fix it with AI. Nothing leaves Atlassian.'],
+    [49.7, 53.6, 'Pearl. Free for up to ten users, on the Atlassian Marketplace.'],
+  ],
+};
+
+const OPAL_VIDEO = {
+  file: 'opal-demo.mp4', poster: 'opal-video', seconds: 58, uploaded: '2026-11-17',
+  name: 'Opal – Markdown for Confluence in 58 seconds',
+  description: 'A short tour of Opal in Confluence Cloud: paste Markdown from an AI chat, a live preview with callouts, tasks, code and Mermaid diagrams, Confluence search finding the words inside, Word export, and converting existing Markdown macros in one click.',
+  cues: [
+    [0.3, 2.7, 'Meet Opal: Markdown for Confluence.'],
+    [3.1, 5.1, 'Paste Markdown from any AI tool.'],
+    [8.9, 12.9, 'The preview draws live, with callouts, tasks, code and diagrams.'],
+    [13.3, 15.5, 'Mermaid diagrams come in five styles.'],
+    [18.6, 21.4, 'On the page, diagrams stay sharp at any zoom.'],
+    [23.7, 25.8, 'Opal follows light and dark mode.'],
+    [28.9, 32.1, 'Confluence search finds the words inside your Markdown.'],
+    [34.3, 38.6, 'Word and PDF exports keep real headings, code and diagrams.'],
+    [40.8, 42.4, 'Coming from Render Markdown?'],
+    [44.1, 45.8, 'Convert a page in one click.'],
+    [49.3, 51.2, 'Same Markdown, now searchable.'],
+    [52.9, 56.8, 'Opal. Free for up to ten users, on the Atlassian Marketplace.'],
+  ],
+};
+
 export const VENDOR = 'notechdebt';
 // "Last updated" on every /apps/ page: the newest of Pearl's release date and Opal's.
 export const UPDATED = [by(PEARL_SHIPPED), OPAL_LIVE].filter(Boolean)
@@ -146,6 +189,7 @@ const pagesSource = [
     }),
     meta: 'Documentation for Pearl on Confluence Cloud.',
     hero: PEARL_SHOTS.sharp,
+    video: from('b', PEARL_VIDEO), // shows release A and B features; replaces the hero screenshot
     og: 'pearl',
     ogSub: 'Sharp Mermaid diagrams in Confluence Cloud, with a live editor, zoom and crisp PDF export.',
     sections: [
@@ -218,6 +262,7 @@ const pagesSource = [
           'Full screen opens the diagram over the page, where plain scrolling zooms; press Esc to close',
           from('a', 'The toolbar\'s download button saves the diagram as a PNG or SVG file, or copies it as an image, in the light version of its style'),
         ]],
+        from('b', PEARL_SHOTS.sharp && figure({ ...PEARL_SHOTS.sharp, caption: 'Diagrams stay sharp at any zoom, in Confluence\'s light and dark themes.' })),
       ] },
       { id: 'export', label: 'EXPORT', h2: 'PDF, Word and page history', blocks: [
         ['table', ['Export', 'What you get'], [
@@ -268,6 +313,7 @@ const pagesSource = [
     one: 'Opal – Markdown for Confluence shows Markdown in Confluence Cloud with callouts, task lists, highlighted code, maths and Mermaid diagrams. Confluence search finds the words inside, PDF and Word exports keep real headings and tables, and blocks can become native Confluence content at any time.',
     meta: 'Documentation for Opal on Confluence Cloud.',
     hero: OPAL_SHOTS.search,
+    video: OPAL_VIDEO,
     og: 'opal',
     ogSub: 'Markdown in Confluence Cloud that search can find, with Mermaid diagrams and real PDF and Word exports.',
     sections: [
@@ -305,6 +351,7 @@ const pagesSource = [
       { id: 'search', label: 'SEARCH', h2: 'Found by Confluence search', blocks: [
         ['p', 'When you save a block, Opal also saves a plain-text copy of it for Confluence\'s search index. Pages then turn up for the words inside their Markdown, including the text of diagrams, and search results show readable excerpts instead of Markdown symbols. New text is usually searchable within a minute of publishing.'],
         ['p', 'Blocks converted from another Markdown app are searchable the same way.'],
+        OPAL_SHOTS.search && figure({ ...OPAL_SHOTS.search, caption: 'Confluence search finds the page for a word inside its Markdown.' }),
       ] },
       { id: 'files', label: 'ATTACHED FILES', h2: 'Show a Markdown file attached to the page', blocks: [
         ['p', 'Teams that keep READMEs and runbooks as files can attach them to the page and show them in a block. In the editor, choose Source → Attached file, then pick one of the page\'s Markdown files (.md, .markdown, .mdown or .mkd).'],

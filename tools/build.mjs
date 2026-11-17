@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, LAYERS } from './projects.mjs';
-import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, SHOT, pages as appPages } from './apps.mjs';
+import { VENDOR, UPDATED as APPS_UPDATED, APPS, APP_COLUMNS, SHOT, MEDIA, pages as appPages } from './apps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://notechdebt.dev';
@@ -205,6 +205,35 @@ function appBlock([kind, a, b], opts = {}) {
   throw new Error(`tools/apps.mjs: unknown block type ${kind}`);
 }
 
+// A page's demo video (tools/apps.mjs `video`): shown in place of the hero screenshot, with its transcript.
+// The MP4 comes from media.notechdebt.dev; the captions (/apps/<slug>/captions.vtt) and poster from this site.
+const transcript = (v) => v.cues.map((c) => c[2]).join(' ');
+function vttTime(s) {
+  const ms = Math.round(s * 1000);
+  const p = (n, w = 2) => String(n).padStart(w, '0');
+  return `${p(Math.floor(ms / 3600000))}:${p(Math.floor(ms / 60000) % 60)}:${p(Math.floor(ms / 1000) % 60)}.${p(ms % 1000, 3)}`;
+}
+const vtt = (v) => `WEBVTT\n\n${v.cues.map(([a, b, t], i) => `${i + 1}\n${vttTime(a)} --> ${vttTime(b)}\n${t}\n`).join('\n')}`;
+
+function appVideo(pg) {
+  const v = pg.video;
+  return `    <div class="app-hero" data-sr="scale"><figure class="app-video">`
+    + `<video controls playsinline preload="none" width="1280" height="720" poster="/img/${v.poster}.webp" aria-label="${esc(v.name)}">`
+    + `<source src="${MEDIA}/${v.file}" type="video/mp4"><track kind="captions" srclang="en" label="English" src="/apps/${pg.slug}/captions.vtt">`
+    + `<a href="${MEDIA}/${v.file}">Watch the video (MP4)</a></video>`
+    + `<figcaption><details><summary>Transcript · ${v.seconds} seconds</summary><p>${esc(transcript(v))}</p></details></figcaption></figure></div>\n`;
+}
+
+function videoObject(pg, url) {
+  const v = pg.video;
+  return {
+    '@type': 'VideoObject', '@id': url + '#video', name: v.name, description: v.description,
+    thumbnailUrl: `${SITE}/img/${v.poster}.webp`, uploadDate: v.uploaded, duration: `PT${v.seconds}S`,
+    contentUrl: `${MEDIA}/${v.file}`, inLanguage: 'en', transcript: transcript(v),
+    author: { '@id': SITE + '/#kristo' }, publisher: { '@id': SITE + '/#org' }
+  };
+}
+
 function appPage(pg) {
   const path = `/apps/${pg.slug}/`;
   const others = appPages.filter((o) => o !== pg).map((o) => `<a href="/apps/${o.slug}/">${esc(o.name)}</a>`).join(' <span aria-hidden="true">·</span> ');
@@ -214,7 +243,7 @@ function appPage(pg) {
       <div><span class="label">${esc(VENDOR.toUpperCase())} · ATLASSIAN MARKETPLACE APPS</span><h1>${esc(pg.name)}</h1></div>
       <p class="pv-one">${esc(pg.one)}</p>
     </div>
-${pg.hero ? `    <div class="app-hero" data-sr="scale">${appFigure(pg.hero.slug, pg.hero.alt, '', '(max-width: 1312px) calc(100vw - 32px), 1280px', ' fetchpriority="high"')}</div>\n` : ''}    <div class="legal">
+${pg.video ? appVideo(pg) : pg.hero ? `    <div class="app-hero" data-sr="scale">${appFigure(pg.hero.slug, pg.hero.alt, '', '(max-width: 1312px) calc(100vw - 32px), 1280px', ' fetchpriority="high"')}</div>\n` : ''}    <div class="legal">
 ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span class="label">${esc(sec.label)}</span><h2>${esc(sec.h2)}</h2>${sec.blocks.map((b) => appBlock(b)).join('')}</section>`).join('\n')}
       <p class="legal-meta">Last updated ${esc(APPS_UPDATED)}. ${esc(pg.meta ?? `Applies to every ${VENDOR} app on the Atlassian Marketplace.`)} Also see: ${others}.</p>
     </div>
@@ -229,9 +258,11 @@ ${pg.sections.map((sec) => `      <section id="${sec.id}" data-sr="up"><span cla
       '@graph': [
         {
           '@type': 'WebPage', '@id': url + '#webpage', url, name: pg.title, description: pg.description, inLanguage: 'en', isPartOf: { '@id': SITE + '/#website' }, breadcrumb: { '@id': url + '#breadcrumb' },
-          ...(pg.hero ? { primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${pg.hero.slug}.webp`, width: SHOT[0], height: SHOT[1] } } : {})
+          ...(pg.hero ? { primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE}/img/${pg.hero.slug}.webp`, width: SHOT[0], height: SHOT[1] } } : {}),
+          ...(pg.video ? { video: { '@id': url + '#video' } } : {})
         },
-        breadcrumb(path, [['Home', '/'], ['Apps'], [pg.name]])
+        breadcrumb(path, [['Home', '/'], ['Apps'], [pg.name]]),
+        ...(pg.video ? [videoObject(pg, url)] : [])
       ]
     },
     main
@@ -249,6 +280,7 @@ function write(rel, html) {
 projects.forEach((p, i) => write(`work/${p.slug}/index.html`, projectPage(p, i)));
 write('work/index.html', workIndex());
 appPages.forEach((pg) => write(`apps/${pg.slug}/index.html`, appPage(pg)));
+appPages.filter((pg) => pg.video).forEach((pg) => write(`apps/${pg.slug}/captions.vtt`, vtt(pg.video)));
 write('404.html', notFound());
 
 // ---------- sitemap: lastmod is the last commit that touched a page's sources, or today if they have uncommitted changes ----------
@@ -262,10 +294,14 @@ function lastmod(sources) {
   } catch { return today; }
 }
 const PAGE_SOURCES = ['tools/projects.mjs', 'tools/build.mjs'];
-const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES]), ...appPages.map((pg) => [`/apps/${pg.slug}/`, ['tools/apps.mjs', 'tools/build.mjs']])];
+const urls = [['/', ['index.html']], [WORK.path, PAGE_SOURCES], ...projects.map((p) => [`/work/${p.slug}/`, PAGE_SOURCES]), ...appPages.map((pg) => [`/apps/${pg.slug}/`, ['tools/apps.mjs', 'tools/build.mjs'], pg.video])];
+const xml = (t) => esc(t).replace(/'/g, '&apos;');
+const sitemapVideo = (v) => `<video:video><video:thumbnail_loc>${SITE}/img/${v.poster}.webp</video:thumbnail_loc><video:title>${xml(v.name)}</video:title>`
+  + `<video:description>${xml(v.description)}</video:description><video:content_loc>${MEDIA}/${v.file}</video:content_loc>`
+  + `<video:duration>${v.seconds}</video:duration><video:publication_date>${v.uploaded}</video:publication_date></video:video>`;
 writeFileSync(join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(([u, f]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</lastmod></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+${urls.map(([u, f, v]) => `  <url><loc>${SITE}${u}</loc><lastmod>${lastmod(f)}</lastmod>${v ? sitemapVideo(v) : ''}</url>`).join('\n')}
 </urlset>
 `);
 out.push('sitemap.xml');
@@ -288,6 +324,7 @@ if (process.argv.includes('--stamp')) {
 const appShots = appPages.flatMap((pg) => [pg.hero?.slug, ...pg.sections.flatMap((sec) => sec.blocks.filter((b) => b[0] === 'figure').map((b) => b[1]))]).filter(Boolean);
 const missing = projects.flatMap((p) => [`img/${p.slug}.webp`, `img/${p.slug}-640.webp`, `img/${p.slug}-960.webp`, `img/og/${p.slug}.png`])
   .concat(appShots.flatMap((s) => [`img/${s}.webp`, `img/${s}-640.webp`, `img/${s}-960.webp`, `img/${s}-1840.webp`]))
-  .concat(appPages.filter((pg) => pg.og).map((pg) => `img/og/${pg.og}.png`), 'img/og/home.png').filter((f) => !existsSync(join(ROOT, f)));
+  .concat(appPages.filter((pg) => pg.og).map((pg) => `img/og/${pg.og}.png`), 'img/og/home.png')
+  .concat(appPages.filter((pg) => pg.video).map((pg) => `img/${pg.video.poster}.webp`)).filter((f) => !existsSync(join(ROOT, f)));
 console.log(`Built ${out.length} files: ${out.join(', ')}`);
 if (missing.length) console.warn(`Missing images (run node tools/images.mjs for og/*.png): ${missing.join(', ')}`);
